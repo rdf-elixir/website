@@ -4,9 +4,9 @@
   "name": "website",
   "description": "Website for the RDF projects in Elixir",
   "scripts": {
-    "dev": "vuepress dev",
-    "build": "vuepress build",
-    "view-info": "vuepress view-info",
+    "dev": "vuepress dev content",
+    "build": "vuepress build content",
+    "view-info": "vuepress view-info content",
     "show-help": "vuepress --help"
   },
   "repository": {

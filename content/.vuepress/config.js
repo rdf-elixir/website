@@ -3,6 +3,7 @@ module.exports = ctx => ({
   description: 'Implementation of the Linked Data and Semantic Standards for Elixir',
   themeConfig: {
     repo: 'marcelotto/rdf-elixir-website',
+    docsDir: 'content',
     editLinks: true,
     nav: getNav(),
     sidebar: getSidebar()
