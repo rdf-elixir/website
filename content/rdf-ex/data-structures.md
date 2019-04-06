@@ -224,7 +224,7 @@ Beyond that, there is
 
 ## Equality
 
-RDF data structures can be compared for equality with the `equal?/2` function of the respective data structure. You should these instead of `==` comparison, because these might contain fields which are not relevant for equality. For example the defined prefixes (see [here](/../rdf-ex/serializations) for more on that) are ignored for this comparison.
+RDF data structures can be compared for equality with the `equal?/2` function of the respective data structure. You should these instead of comparisons with `==`, because the data structures might contain fields which are not relevant for equality. For example the defined prefixes (see [here](/../rdf-ex/serializations) for more on that) are ignored for this comparison.
 
 ```elixir
 iex> d = RDF.description(EX.S, EX.p, EX.O)
