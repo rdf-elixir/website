@@ -30,4 +30,5 @@ sidebar: false
     - [Querying RDF with Elixir - Using SPARQL.ex to query over RDF datastores](https://medium.com/@tonyhammond/querying-rdf-with-elixir-2378b39d65cc)
     - [Robust compute for RDF queries - Managing fault tolerance in Elixir with supervision trees](https://medium.com/@tonyhammond/robust-compute-for-rdf-queries-eb2ad665ef12)
     - [Jupyter Notebooks with Elixir and RDF - Using IElixir in JupyterLab with the SPARQL.Client package](https://medium.com/@tonyhammond/jupyter-notebooks-with-elixir-and-rdf-598689c2dad3)
+    - [Graph to graph with Elixir - Moving data between semantic and property graphs](https://medium.com/@tonyhammond/graph-to-graph-with-elixir-9cd7fd6f2128)
 
