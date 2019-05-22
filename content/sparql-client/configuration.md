@@ -42,3 +42,14 @@ end
 config :tesla, :adapter, Tesla.Adapter.Ibrowse
 ```
 
+
+If you want to pass custom, per-request middleware or adapter options for Tesla (see `opts` option of the `Tesla.request/2` function) you can do this via the `request_opts` option of `SPARQL.Client.querty/3` function. For example, the timeout option for the Hackney adapter can be set like this:
+
+```elixir
+SPARQL.Client.query(query, "http://example.com/sparql",
+    request_opts: [adapter: [recv_timeout: 30_000]])
+```
+
+::: danger
+Unfortunately, there's currently no general way to set the timeout, because of this open Tesla issue <https://github.com/teamon/tesla/issues/255>. So, for now, timeouts must be set in an adapter-specific way like shown in the previous example.
+:::
