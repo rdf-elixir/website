@@ -25,8 +25,8 @@
   },
   "homepage": "https://github.com/marcelotto/rdf-elixir-website#readme",
   "devDependencies": {
-    "@vuepress/plugin-back-to-top": "^1.0.0-alpha.46",
-    "@vuepress/plugin-pwa": "^1.0.0-alpha.46",
-    "vuepress": "^1.0.0-alpha.46"
+    "@vuepress/plugin-back-to-top": "^1.0.2",
+    "@vuepress/plugin-pwa": "^1.0.2",
+    "vuepress": "^1.0.2"
   }
 }
