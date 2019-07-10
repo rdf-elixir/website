@@ -37,7 +37,6 @@ function getNav () {
   return [
     navItem('RDF.ex', '/rdf-ex/'),
     navItem('SPARQL.ex', '/sparql-ex/'),
-    navItem('SPARQL.Client', '/sparql-client/'),
     {
       text: 'API Documentation', items: [
         navItem('RDF.ex', 'https://hexdocs.pm/rdf/'),
@@ -61,7 +60,6 @@ function getSidebar () {
   return {
     '/rdf-ex/': getRDFSidebar(),
     '/sparql-ex/': getSPARQLSidebar(),
-    '/sparql-client/': getSPARQLClientSidebar()
   }
 }
 
@@ -94,27 +92,14 @@ function getSPARQLSidebar () {
       collapsable: false,
       children: [
         '',
-        'feature-limitations',
         'installation',
         'executing-queries',
+        'sparql-client',
+        'default-prefixes',
         'defining-extension-functions',
+        'sparql-client-configuration',
+        'limitations',
       ]
     }
   ]
 }
-
-function getSPARQLClientSidebar () {
-  return [
-    {
-      title: 'SPARQL.Client',
-      collapsable: true,
-      children: [
-        '',
-        'installation',
-        'examples',
-        'configuration',
-      ]
-    }
-  ]
-}
-

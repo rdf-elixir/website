@@ -1,4 +1,4 @@
-# Feature limitations
+# Limitations
 
 SPARQL.ex does currently not support the complete feature set of SPARQL 1.1. Here's a checklist of what's currently supported:
 

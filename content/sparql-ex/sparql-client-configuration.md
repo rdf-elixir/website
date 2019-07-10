@@ -1,4 +1,4 @@
-# Configuration
+# SPARQL client configuration
 
 SPARQL.Client uses [Tesla](https://github.com/teamon/tesla), an abstraction over different HTTP client libraries. This allows you to use the HTTP client of your choice, as long as a Tesla adapter exists. Currently httpc, [hackney](https://github.com/benoitc/hackney) or [ibrowse](https://github.com/cmullaparthi/ibrowse). 
 
@@ -51,5 +51,5 @@ SPARQL.Client.query(query, "http://example.com/sparql",
 ```
 
 ::: danger
-Unfortunately, there's currently no general way to set the timeout, because of this open Tesla issue <https://github.com/teamon/tesla/issues/255>. So, for now, timeouts must be set in an adapter-specific way like shown in the previous example.
+Unfortunately, there's currently no general way to set the timeout, because of this open Tesla issue <https://github.com/teamon/tesla/issues/255>. So for now, timeouts must be set in an adapter-specific way like shown in the previous example.
 :::

@@ -1,6 +1,12 @@
-# Examples
+# Queries against SPARQL endpoints
 
-## `SELECT` query
+The major function of the SPARQL.Client is `SPARQL.Client.query/3`, which performs the various forms of SPARQL queries. It takes a SPARQL query string, a SPARQL endpoint URL, and some options. The query is only sent to the endpoint if it is syntactically valid. Depending on the query form either a `SPARQL.Query.Result` struct or an `RDF.Graph` is returned.
+
+For a more detailed description, including the various `SPARQL.Client.query/3` options, see the [API documentation](http://hexdocs.pm/sparql_client/SPARQL.Client.html#query/3).
+
+## Examples
+
+### `SELECT` query
 
 ```elixir
 # Places with free wi-fi from Wikidata
@@ -49,7 +55,7 @@ LIMIT 100
 } 
 ```
 
-## `ASK` query
+### `ASK` query
 
 ```elixir
 """
@@ -68,7 +74,7 @@ ASK {:Sleepers dbo:starring :Kevin_Bacon }
 ```
 
 
-## `DESCRIBE` query
+### `DESCRIBE` query
 
 ```elixir
 "DESCRIBE <http://dbpedia.org/resource/Elixir_(programming_language)>"
@@ -119,7 +125,7 @@ ASK {:Sleepers dbo:starring :Kevin_Bacon }
 }  
 ```
 
-## `CONSTRUCT` query
+### `CONSTRUCT` query
 
 ```elixir
 """

@@ -1,4 +1,4 @@
-# Defining extension functions
+# Extension functions
 
 The SPARQL query language has a specified way for the introduction of custom [extension functions](https://www.w3.org/TR/sparql11-query/#extensionFunctions). An extension function for a function with the name `http://example.com/fun` can be defined in SPARQL.ex like this:
 
@@ -17,3 +17,7 @@ The name of the module is arbitrary and has no further meaning. The first argume
 - `base`: the base IRI
 - `time`: the query execution time
 - `bnode_generator`: the name of the `RDF.BlankNode.Generator` (see [RDF.ex documentation](http://hexdocs.pm/rdf)) used to generate unique blank nodes consistently
+
+::: danger
+Note that extension functions can of course only be used with queries run against RDF.ex data. For external SPARQL endpoints you'll have to live with the extension functions available on the underlying query engine used to run the SPARQL endpoint.
+:::

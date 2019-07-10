@@ -4,7 +4,9 @@ The [RDF.ex Hex package](https://hex.pm/packages/rdf) can be installed as usual,
 
 ```elixir
 def deps do
-  [{:rdf, "~> 0.6"}]
+  [
+    {:rdf, "~> 0.6"}
+  ]
 end
 ```
 

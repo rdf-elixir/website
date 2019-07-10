@@ -4,6 +4,18 @@ The [SPARQL.ex Hex package](https://hex.pm/packages/sparql) can be installed as 
 
 ```elixir
 def deps do
-  [{:sparql, "~> 0.2"}]
+  [
+    {:sparql, "~> 0.2"}
+  ]
+end
+```
+
+The [SPARQL.Client Hex package](https://hex.pm/packages/sparql_client) can be installed by adding `sparql_client` to `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:sparql_client, "~> 0.2"}
+  ]
 end
 ```
