@@ -8,6 +8,8 @@ sidebar: false
 - [JSON-LD.ex](https://hex.pm/packages/json_ld)
 - [SPARQL.ex](https://hex.pm/packages/sparql)
 - [SPARQL.Client](https://hex.pm/packages/sparql_client)
+- [ShEx.ex](https://hex.pm/packages/shex)
+
 
 # Github projects
 
@@ -15,6 +17,8 @@ sidebar: false
 - [JSON-LD.ex](https://github.com/marcelotto/jsonld-ex)
 - [SPARQL.ex](https://github.com/marcelotto/sparql-ex)
 - [SPARQL.Client](https://github.com/marcelotto/sparql_client)
+- [ShEx.ex](https://github.com/marcelotto/shex-ex)
+
 
 # Social channels
 

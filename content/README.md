@@ -11,10 +11,10 @@ features:
     Data structures to build RDF graphs and datasets, which can be loaded and stored in the most popular serializations formats - N-Triples, Turtle, JSON-LD
 - title: SPARQL.ex
   details: >-
-    Perform SPARQL queries against the data in your RDF.ex data structures
-- title: SPARQL.Client
+    Perform SPARQL queries against the data in your RDF.ex data structures or any public SPARQL service - Wikidata, Dbpedia, LinkedGeoData, you name it
+- title: ShEx.ex
   details: >-
-    Perform SPARQL queries against any public SPARQL service - Wikidata, Dbpedia, LinkedGeoData, you name it 
+    Perform validations on the data in your RDF.ex data structures
 footer: MIT Licensed | Copyright © 2017-present Marcel Otto
 ---
 

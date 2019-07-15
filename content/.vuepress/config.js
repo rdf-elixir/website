@@ -37,11 +37,13 @@ function getNav () {
   return [
     navItem('RDF.ex', '/rdf-ex/'),
     navItem('SPARQL.ex', '/sparql-ex/'),
+    navItem('ShEx.ex', '/shex-ex/'),
     {
       text: 'API Documentation', items: [
         navItem('RDF.ex', 'https://hexdocs.pm/rdf/'),
         navItem('SPARQL.ex', 'https://hexdocs.pm/sparql/'),
         navItem('SPARQL.Client', 'https://hexdocs.pm/sparql_client/'),
+        navItem('ShEx.ex', 'https://hexdocs.pm/shex/'),
       ]
     },
     navItem('Links', '/links')
@@ -60,6 +62,8 @@ function getSidebar () {
   return {
     '/rdf-ex/': getRDFSidebar(),
     '/sparql-ex/': getSPARQLSidebar(),
+    '/shex-ex/': getShExSidebar(),
+    
   }
 }
 
@@ -98,6 +102,22 @@ function getSPARQLSidebar () {
         'default-prefixes',
         'defining-extension-functions',
         'sparql-client-configuration',
+        'limitations',
+      ]
+    }
+  ]
+}
+
+function getShExSidebar () {
+  return [
+    {
+      title: 'ShEx.ex',
+      collapsable: false,
+      children: [
+        '',
+        'installation',
+        'shape-maps',
+        'validation',
         'limitations',
       ]
     }
