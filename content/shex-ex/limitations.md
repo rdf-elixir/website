@@ -1,6 +1,7 @@
 # Limitations
 
 - the following ShEx features are not implemented yet:
+    - structural schema validations on schema creation time
     - imports
     - external shapes
     - annotations
