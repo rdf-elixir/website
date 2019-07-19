@@ -118,24 +118,26 @@ The validation of all the nodes in ShapeMap can also run be run in parallel by p
 result = ShEx.validate(data, schema, shape_map, parallel: true)
 ```
 
-Under the hood the work of processing the nodes is distributed in batches over your CPUs with the [Flow](https://github.com/plataformatec/flow) library. By default `parallel` is `false`, meaning Flow isn't used at all, since for small amounts of nodes to be validated the usage Flow means a little overhead. You can however make it `true` by default with the following configuration:
+Under the hood the work of processing the nodes is distributed in batches over your CPUs with the [Flow](https://github.com/plataformatec/flow) library. Since for small amounts of nodes to be validated the usage of Flow means a little overhead, if you don't provide the option explicitly the `parallel` flag is set to `true` only for query ShapeMaps (as these usually produce more ShapeMap associations) and fixed ShapeMaps with more than 10 ShapeMap associations.
+
+You can however turn off this auto-setting of the `parallel` flag with the `parallel` application configuration field:
 
 ```elixir
 config :shex,
   parallel: true
 ```
 
-It is planned that ShEx.ex tries to come up with sensible defaults for the Flow configuration based on the input, but currently without a proper empirical foundation the Flow defaults will be used. So, you're well-advised to have a look at the [Flow documentation](https://hexdocs.pm/flow/Flow.html) and play with its options. The options to `ShEx.validate/4` are passed through to [`Flow.from_enumerable/2`](https://hexdocs.pm/flow/Flow.html#from_enumerable/2`). You can also configure them globally:
+ShEx.ex automatically uses sane defaults for the Flow configuration. You can still try to tweak them for yourself. The options to `ShEx.validate/4` are passed through to [`Flow.from_enumerable/2`](https://hexdocs.pm/flow/Flow.html#from_enumerable/2`). You can also configure them globally:
 
 ```elixir
 config :shex,
   flow_opts: [
-    max_demand: 100,
+    max_demand: 20,
     min_demand: 10,
     stages: 8
   ]
 ```
 
-These default options are used whenever `parallel` is set to true (by default or individually) and no Flow option is provided on a `ShEx.validate/4` call.
+These default options are used whenever `parallel` is set to `true` and no Flow option is provided on a `ShEx.validate/4` call.
 
 You're invited to share your experience or thoughts on the [forum](https://discuss.rdf.community/c/rdf-tooling-libraries/elixir), a [GitHub issue]() or PR.
