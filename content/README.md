@@ -24,7 +24,8 @@ def schema_org_description do
   |> RDF.type(Schema.Website)
   |> Schema.about(
        ~I<https://github.com/marcelotto/rdf-ex>,
-       ~I<https://github.com/marcelotto/sparql-ex>
+       ~I<https://github.com/marcelotto/sparql-ex>,
+       ~I<https://github.com/marcelotto/shex-ex>
      )
   |> JSON.LD.write_file!("description.jsonld")
 end
