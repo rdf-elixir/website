@@ -31,7 +31,15 @@ RDF.read_file!("/path/to/some_file.ttl")
 
 ## Base IRI
 
-For serialization formats which support it, you can provide a base IRI on the read functions with the `base` option. You can also provide a default base IRI in your application configuration, which will be used when no `base` option is given.
+For serialization formats which support it, you can provide a base IRI on the read functions with the `base_iri` option. If you don't pass it, the base IRI associated with the serialized graph is used. This is automatically set on deserialization to the one used in serialization or you set it on the graph with the `RDF.Graph.set_base_iri/2` function, which also also accepts [`RDF.Vocabulary.Namespace` modules](/rdf-ex/vocabularies).
+
+
+```elixir
+graph
+|> RDF.Graph.set_base_iri(EX)
+```
+
+You can also provide a default base IRI in your application configuration, which will be used when no base IRI is given as an option or is set on the graph.
 
 ```elixir
 config :rdf,
