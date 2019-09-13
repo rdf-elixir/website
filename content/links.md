@@ -9,6 +9,7 @@ sidebar: false
 - [SPARQL.ex](https://hex.pm/packages/sparql)
 - [SPARQL.Client](https://hex.pm/packages/sparql_client)
 - [ShEx.ex](https://hex.pm/packages/shex)
+- [Skout](https://hex.pm/packages/skout)
 
 
 # Github projects
@@ -18,6 +19,7 @@ sidebar: false
 - [SPARQL.ex](https://github.com/marcelotto/sparql-ex)
 - [SPARQL.Client](https://github.com/marcelotto/sparql_client)
 - [ShEx.ex](https://github.com/marcelotto/shex-ex)
+- [Skout](https://github.com/marcelotto/skout)
 
 
 # Social channels
