@@ -5,7 +5,7 @@ The [RDF.ex Hex package](https://hex.pm/packages/rdf) can be installed as usual,
 ```elixir
 def deps do
   [
-    {:rdf, "~> 0.6"}
+    {:rdf, "~> 0.7"}
   ]
 end
 ```
@@ -15,7 +15,7 @@ If you want to read or write [JSON-LD](http://www.w3.org/TR/json-ld/), you also 
 ```elixir
 def deps do
   [
-    {:rdf, "~> 0.6"},
+    {:rdf, "~> 0.7"},
     {:json_ld, "~> 0.3"},
   ]
 end
