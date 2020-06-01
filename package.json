@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marcelotto/rdf-elixir-website.git"
+    "url": "git+https://github.com/rdf-elixir/website.git"
   },
   "keywords": [
     "documentation",
@@ -21,9 +21,9 @@
   "author": "Marcel Otto",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/marcelotto/rdf-elixir-website/issues"
+    "url": "https://github.com/rdf-elixir/website/issues"
   },
-  "homepage": "https://github.com/marcelotto/rdf-elixir-website#readme",
+  "homepage": "https://github.com/rdf-elixir/website#readme",
   "devDependencies": {
     "@vuepress/plugin-back-to-top": "^1.0.2",
     "@vuepress/plugin-pwa": "^1.0.2",

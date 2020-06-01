@@ -18,7 +18,7 @@ module.exports = ctx => ({
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
   ],
   themeConfig: {
-    repo: 'marcelotto/rdf-elixir-website',
+    repo: 'rdf-elixir/website',
     docsDir: 'content',
     editLinks: true,
     nav: getNav(),
