@@ -1,6 +1,6 @@
 # SPARQL client configuration
 
-SPARQL.Client uses [Tesla](https://github.com/teamon/tesla), an abstraction over different HTTP client libraries. This allows you to use the HTTP client of your choice, as long as a Tesla adapter exists. Currently httpc, [hackney](https://github.com/benoitc/hackney) or [ibrowse](https://github.com/cmullaparthi/ibrowse). 
+SPARQL.Client uses [Tesla](https://github.com/teamon/tesla), an abstraction over different HTTP client libraries. This allows you to use the HTTP client of your choice, as long as a Tesla adapter exists. Currently httpc, [hackney](https://github.com/benoitc/hackney) or [ibrowse](https://github.com/cmullaparthi/ibrowse), [gun](https://github.com/ninenines/gun) and [mint](https://github.com/elixir-mint/mint) are supported. 
 
 Without further configuration, the built-in Erlang httpc is used. You can use it for simple tests or to keep your dependencies clean, but I recommend using one of the alternatives. I've experienced encoding related issues with httpc, which none of the other HTTP clients had.
 
@@ -21,25 +21,6 @@ and add this line to your `config.exs` file (or environment specific configurati
 
 ```elixir
 config :tesla, :adapter, Tesla.Adapter.Hackney
-```
-
-The ibrowse configuration looks similarly.
-
-`mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:sparql_client, "~> 0.2"},
-    {:ibrowse, "~> 4.2"}
-  ]
-end
-```
-
-`config.exs`:
-
-```elixir
-config :tesla, :adapter, Tesla.Adapter.Ibrowse
 ```
 
 
