@@ -6,6 +6,5 @@
     - external shapes
     - annotations
     - semantic actions
-- only the [datatypes supported by RDF.ex](https://rdf-elixir.dev/rdf-ex/literals.html#typed-literals) are supported in datatype and numeric facet constraints (more supported datatypes are the next planned feature for RDF.ex)
-- greedy
+- greedy matching
 - non-ascii characters in regular expressions are not fully supported yet
