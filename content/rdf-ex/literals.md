@@ -244,7 +244,7 @@ nil
 You can define your own custom datatype by implementing the `RDF.Literal.Datatype` behaviour. Defining a completely independent dataype however, will probably be the exception and goes beyond the scope of this introductary guide. Most of the time you want to introduce a custom datatype by constraining one of the existing XSD datatypes through datatype derivation. 
 
 ::: danger
-It should be noted that, unless it is a well-known datatype for a triple store they won't know how to handle them, so they should be introduced cautiously. But at least in the RDF.ex libraries they will behave like the predefined XSD datatypes. In particular you can apply the respective SPARQL functions within SPARQL.ex on them.
+It should be noted that a triple store won't know how to handle your custom datatype unless it's a well-known datatype he supports, so they should be introduced cautiously. But at least in the RDF.ex libraries they will behave like the predefined XSD datatypes. In particular you can apply the respective SPARQL functions within SPARQL.ex on them.
 :::
 
 So, a custom datatype can be derived from a XSD datatype (with an existing `RDF.Literal.Datatype` implementation) by defining a new module with `use RDF.XSD.Datatype.Restriction` and constraining its value space. RDF.ex implements most of the [XSD facets](https://www.w3.org/TR/xmlschema-2/#rf-facets) as `RDF.XSD.Facet` modules for this:
@@ -300,7 +300,7 @@ This datatype can now constructed by either its `new` constructor or via the gen
 
 ```elixir
 iex> MyApp.PersonAge.new(42)
-%RDF.Literal{literal: %MyApp.PersonAge{value: 42, lexical: "42 "}, valid: true}
+%RDF.Literal{literal: %MyApp.PersonAge{value: 42, lexical: "42"}, valid: true}
 
 iex> RDF.literal(42, datatype: "http://example.com/person_age")
 %RDF.Literal{literal: %MyApp.PersonAge{value: 42, lexical: "42"}, valid: true}
