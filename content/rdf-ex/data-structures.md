@@ -178,11 +178,101 @@ iex> RDF.Graph.new({EX.S1, EX.p, [EX.O1, EX.O2]})
 - `RDF.Dataset.graph` returns the graph of the dataset with the given name 
 
 
-## Querying graphs with the SPARQL query language
+## Querying graphs
 
-The [SPARQL.ex](/sparql-ex) package allows you to execute SPARQL queries against RDF.ex data structures. It's still very limited at the moment. It just supports `SELECT` queries with basic graph pattern matching, filtering and projection and works on `RDF.Graph`s only. But even in this early, limited form it allows to express more powerful queries in a simpler way than with the plain `RDF.Graph` API.
+The SPARQL.ex package allows you to execute SPARQL queries against RDF.ex graphs. It's still very limited at the moment. See the [SPARQL.ex guide](/sparql-ex) for more information. But you can also do basic graph queries within RDF.ex directly with the `RDF.Graph.query/2` or `RDF.Graph.query_stream/2` functions.
 
-See the [SPARQL.ex guide](/sparql-ex) for more information and some examples.
+These functions take a graph and a basic graph pattern (BGP) consisting of a list of triples with variables, which are written as atoms ending with a question mark. This query for example returns all triples about resources which have a `rdfs:label "foo"`:
+
+```elixir
+RDF.Graph.query(graph, [
+    {:s?, RDFS.label, "foo"},
+    {:s?, :p?, :o?}
+  ])
+```
+
+The results are returned in a `:ok` tuple (or directly with `RDF.Query.execute!/2`) as a list of solutions for the variables as a map where the atoms for the variables without the ending question mark are used as keys.
+
+```elixir
+{:ok, [
+  %{
+    s: ~I<http://example.com/subject>,
+    p: ~I<http://www.w3.org/2000/01/rdf-schema#label>,
+    o: ~L"foo"
+  },
+  # ...
+]}
+```
+
+All the short forms for RDF terms described in these guide are supported in the query patterns:
+
+- capitalized vocabulary terms for IRI don't need to be expanded manually
+- Elixir values on the object positions are automatically coerced to the respectively typed literals
+
+The `rdf:type` property can be written shortly with atom `:a`.
+
+Blank nodes can be written more shortly in the query pattern with atoms starting with an underscore.
+
+::: tip
+Blank nodes in query patterns have the interesting property to behave like variables which don't show up in the results. So, they can be quite convient for intermediary variables.
+:::
+
+```elixir
+iex> RDF.Graph.query(graph, [
+...>    {:_s, :a, EX.Class},
+...>    {:_s, RDFS.label, :name}
+...>  ])
+{:ok, [
+  %{name: ~L"foo"},
+  # ...
+]}
+```
+
+Also, similar short-notations for collapsing multiple statements as in Turtle and SPARQL are supported:
+
+- Multiple objects to the same subject-predicate pair can be written by just writing them one by one in the same triple pattern. 
+- Multiple predicate-objects pair on the same subject can be written by grouping them with square brackets.
+
+```elixir
+RDF.Graph.query(graph, [
+    {:s?, 
+        [EX.p2, :o?],
+        [EX.p3, 42, 3.14, true]
+    },
+    {:o?, EX.p, "foo", "bar"},
+  ])
+```
+
+If you want store a basic graph pattern query in a variable for reuse or want to build your own query builder function you can use the `RDF.Query.bgp/1` function. This function is used implicitly by `RDF.Graph.query/2` to build `RDF.Query.BGP` structs from lists (or tuples for single triple patterns).
+
+```elixir
+query = 
+  RDF.Query.bgp [
+    {:_s, :a, EX.Class},
+    {:_s, RDFS.label, :name}
+  ]
+
+RDF.Graph.query(graph, query)
+```
+
+The `RDF.Query` module also offers another handy builder function: `RDF.Query.path/1` creates a basic graph pattern for a list representing a path through the graph.
+
+```elixir
+RDF.Graph.query(graph, RDF.Query.path([EX.S, EX.p, RDFS.label, :name?]))
+```
+
+This is similar to the following query:
+
+```elixir
+RDF.Graph.query(graph, [
+    {EX.S, EX.p, :_o},
+    {:_o, RDFS.label, :name?},
+  ])
+```
+
+If you want the path builder function to generate variables (instead of blank nodes) for the path element objects in order to get them in the results, you can say so with the `with_elements: true` option.
+
+Instead of executing the query to get the results directly, you can also request the results as a stream with the `RDF.Graph.query_stream/2` and `RDF.Graph.query_stream!/2` functions.
 
 
 ## Deleting statements
