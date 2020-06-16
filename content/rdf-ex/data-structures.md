@@ -191,7 +191,7 @@ RDF.Graph.query(graph, [
   ])
 ```
 
-The results are returned in a `:ok` tuple (or directly with `RDF.Query.execute!/2`) as a list of solutions for the variables as a map where the atoms for the variables without the ending question mark are used as keys.
+The results are returned in an `:ok` tuple (or directly with `RDF.Graph.query!/2`) as a list of solutions for the variables. The solutions are maps where the keys are the variables without the ending question mark.
 
 ```elixir
 {:ok, [
@@ -204,9 +204,9 @@ The results are returned in a `:ok` tuple (or directly with `RDF.Query.execute!/
 ]}
 ```
 
-All the short forms for RDF terms described in these guide are supported in the query patterns:
+All the short forms for RDF terms described in this guide are supported in the query patterns:
 
-- capitalized vocabulary terms for IRI don't need to be expanded manually
+- capitalized vocabulary terms for IRIs don't need to be expanded manually
 - Elixir values on the object positions are automatically coerced to the respectively typed literals
 
 The `rdf:type` property can be written shortly with atom `:a`.
@@ -214,7 +214,7 @@ The `rdf:type` property can be written shortly with atom `:a`.
 Blank nodes can be written more shortly in the query pattern with atoms starting with an underscore.
 
 ::: tip
-Blank nodes in query patterns have the interesting property to behave like variables which don't show up in the results. So, they can be quite convient for intermediary variables.
+Blank nodes in query patterns have the interesting property to behave like variables which don't show up in the results. So they can be quite convient for intermediary variables.
 :::
 
 ```elixir
@@ -228,10 +228,10 @@ iex> RDF.Graph.query(graph, [
 ]}
 ```
 
-Also, similar short-notations for collapsing multiple statements as in Turtle and SPARQL are supported:
+Similar short-notations for collapsing multiple statements as in Turtle and SPARQL are supported also:
 
 - Multiple objects to the same subject-predicate pair can be written by just writing them one by one in the same triple pattern. 
-- Multiple predicate-objects pair on the same subject can be written by grouping them with square brackets.
+- Multiple predicate-object pairs on the same subject can be written by grouping them with square brackets.
 
 ```elixir
 RDF.Graph.query(graph, [
