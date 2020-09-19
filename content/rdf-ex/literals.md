@@ -99,7 +99,7 @@ alias RDF.XSD
 
 XSD.String.new("foo")
 XSD.string("foo")
-XSD.integer42)
+XSD.integer(42)
 XSD.byte(42)
 RDF.LangString.new("foo", language: "en")
 RDF.langString("foo", language: "en")
