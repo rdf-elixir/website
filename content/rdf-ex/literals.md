@@ -427,7 +427,7 @@ iex> RDF.literal("foo", datatype: "http://example.com/dt") |> RDF.Literal.is_a?(
 true
 ```
 
-Most of the functions on the `RDF.Literal.Datatype` modules are only applicable only on literals of exact this datatype, but there are two notable exceptions which can be handy. 
+Most of the functions on the `RDF.Literal.Datatype` modules are only applicable on literals of exact this datatype, but there are two notable exceptions which can be handy. 
 
 The `valid?/1` function on `RDF.Literal.Datatype` modules is able to deal with derived datatypes and returns `true` if the given literal is valid AND of the proper type.
 

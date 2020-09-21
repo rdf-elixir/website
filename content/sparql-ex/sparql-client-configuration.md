@@ -11,7 +11,7 @@ So, for hackney you'll have to add `hackney` to `mix.exs`:
 ```elixir
 def deps do
   [
-    {:sparql_client, "~> 0.2"},
+    {:sparql_client, "~> 0.3"},
     {:hackney, "~> 1.6"}
   ]
 end
@@ -34,3 +34,5 @@ SPARQL.Client.query(query, "http://example.com/sparql",
 ::: danger
 Unfortunately, there's currently no general way to set the timeout, because of this open Tesla issue <https://github.com/teamon/tesla/issues/255>. So for now, timeouts must be set in an adapter-specific way like shown in the previous example.
 :::
+
+The SPARQL.Client package also supports configuring the defaults for many of the various options of the query and update functions through the application environment. See the [API documentation](http://hexdocs.pm/sparql_client/SPARQL.Client.html) for information on this.

@@ -1,8 +1,47 @@
-# Queries against SPARQL endpoints
+# Queries and updates against SPARQL endpoints
 
-The major function of the SPARQL.Client is `SPARQL.Client.query/3`, which performs the various forms of SPARQL queries. It takes a SPARQL query string, a SPARQL endpoint URL, and some options. The query is only sent to the endpoint if it is syntactically valid. Depending on the query form either a `SPARQL.Query.Result` struct or an `RDF.Graph` is returned.
+The [SPARQL Protocol](https://www.w3.org/TR/sparql11-protocol/) defines how the operations specified in the SPARQL query and update specs can be requested by a client from a SPARQL service via HTTP. Such SPARQL protocol operations can be requested with the [SPARQL.Client](https://hex.pm/packages/sparql_client) package.
 
-For a more detailed description, including the various `SPARQL.Client.query/3` options, see the [API documentation](http://hexdocs.pm/sparql_client/SPARQL.Client.html#query/3).
+It consists basically of the `SPARQL.Client` module which provides dedicated functions for the various forms of SPARQL query and update operations and generic `query/3` and `update/3` for the query and update operations.
+
+The query functions can be called with a `SPARQL.Query` struct or a SPARQL query as a raw string. By default, a SPARQL query string will be parsed into a `SPARQL.Query` struct for validation purposes before the string is send via an HTTP request to the SPARQL protocol service endpoint. This parsing step can be omitted by setting `:raw_mode` option to `true` on the dedicated
+functions for the various SPARQL operation forms.
+
+```
+"SELECT * { ?s ?p ?o .}"
+|> SPARQL.Client.select("http://example.com/sparql", raw_mode: true)
+```
+
+On the generic `SPARQL.Client.query/3` this raw-mode is not supported, since the parsing is needed there to determine the query form which determines which result to expect.
+
+For SPARQL update operations the picture is a little different. The SPARQL.ex package doesn't provide parsing of SPARQL updates (yet), but except for `INSERT` and `DELETE` updates this isn't actually needed, since all elements of the updates can be provided directly to the respective functions for the update forms, which will generate valid SPARQL updates.
+
+```elixir
+RDF.Graph.new({EX.S, EX.p, EX.O})
+|> SPARQL.Client.insert_data("http://example.com/sparql")
+```
+
+You can still provide hand-written update strings to these functions, but due to the lack of SPARQL update parsing the raw-mode is mandatory then. For the `INSERT` and `DELETE` update forms this the only way to request them for now.
+
+```elixir
+"""
+PREFIX dc:  <http://purl.org/dc/elements/1.1/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+INSERT
+{ GRAPH <http://example/bookStore2> { ?book ?p ?v } }
+WHERE
+{ GRAPH  <http://example/bookStore>
+     { ?book dc:date ?date .
+       FILTER ( ?date > "1970-01-01T00:00:00-02:00"^^xsd:dateTime )
+       ?book ?p ?v
+} }
+"""
+|> SPARQL.Client.insert("http://example.com/sparql", raw_mode: true)
+```
+
+For a more detailed description, including the various options, see the [API documentation](http://hexdocs.pm/sparql_client/SPARQL.Client.html).
+
 
 ## Examples
 
@@ -54,6 +93,7 @@ LIMIT 100
  }
 } 
 ```
+
 
 ### `ASK` query
 
@@ -125,6 +165,7 @@ ASK {:Sleepers dbo:starring :Kevin_Bacon }
 }  
 ```
 
+
 ### `CONSTRUCT` query
 
 ```elixir
@@ -165,5 +206,116 @@ WHERE  {
               ~I<http://dbpedia.org/resource/Apache_License>
           ~I<http://example.org/name>
               ~L"Elixir"en}}
+```
+
+
+### `INSERT` and `DELETE` updates
+
+```elixir
+"""
+PREFIX dc:  <http://purl.org/dc/elements/1.1/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+INSERT
+{ GRAPH <http://example/bookStore2> { ?book ?p ?v } }
+WHERE
+{ GRAPH  <http://example/bookStore>
+     { ?book dc:date ?date .
+       FILTER ( ?date > "1970-01-01T00:00:00-02:00"^^xsd:dateTime )
+       ?book ?p ?v
+} }
+"""
+|> SPARQL.Client.update("http://example.com/sparql", raw_mode: true)
+```
+
+`DELETE` updates work similarly.
+
+
+### `INSERT DATA` and `DELETE DATA` updates
+
+```elixir
+RDF.Graph.new({EX.S, EX.p, EX.O})
+|> SPARQL.Client.insert_data("http://example.com/sparql")
+```
+
+```elixir
+EX.S
+|> EX.p(EX.O)
+|> SPARQL.Client.delete_data("http://example.com/sparql")
+```
+
+
+### `LOAD` update
+
+```elixir
+SPARQL.Client.load("http://example.com/sparql", from: "http://example.com/Resource")
+```
+
+
+### `CLEAR` update
+
+```elixir
+SPARQL.Client.clear("http://example.com/sparql", graph: EX.Graph)
+```
+
+```elixir
+SPARQL.Client.clear("http://example.com/sparql", graph: :all, silent: true)
+```
+
+
+### `CREATE` graph management operation
+
+```elixir
+SPARQL.Client.create("http://example.com/sparql", graph: EX.Graph)
+```
+
+
+### `DROP` graph management operation
+
+```elixir
+SPARQL.Client.drop("http://example.com/sparql", graph: EX.Graph)
+```
+
+```elixir
+SPARQL.Client.drop("http://example.com/sparql", graph: :named)
+```
+
+
+### `COPY` graph management operation
+
+```elixir
+SPARQL.Client.copy("http://example.com/sparql",
+   from: "http://example.com/Graph1", to: "http://example.com/Graph2")
+```
+
+```elixir
+SPARQL.Client.copy("http://example.com/sparql",
+  from: :default, to: EX.Graph, silent: true)
+```
+
+
+### `MOVE` graph management operation
+
+```elixir
+SPARQL.Client.move("http://example.com/sparql",
+   from: "http://example.com/Graph1", to: "http://example.com/Graph2")
+```
+
+```elixir
+SPARQL.Client.move("http://example.com/sparql",
+  from: :default, to: EX.Graph, silent: true)
+```
+
+
+### `ADD` graph management operation
+
+```elixir
+SPARQL.Client.add("http://example.com/sparql",
+   from: "http://example.com/Graph1", to: "http://example.com/Graph2")
+```
+
+```elixir
+SPARQL.Client.add("http://example.com/sparql",
+  from: :default, to: EX.Graph, silent: true)
 ```
 
