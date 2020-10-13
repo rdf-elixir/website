@@ -19,3 +19,5 @@ def deps do
   ]
 end
 ```
+
+See also the [SPARQL.Client configuration page](/sparql-ex/sparql-client-configuration) on how to setup the HTTP client to be used by `SPARQL.Client`.
