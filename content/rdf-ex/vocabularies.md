@@ -143,7 +143,7 @@ defmodule YourApp.NS do
 end
 ```
 
-Though strictly discouraged, a vocabulary namespace can be defined as non-strict with the `strict` option set to `false`. A non-strict vocabulary doesn't require any terms to be defined (although they can). A term is resolved dynamically at runtime by concatenation of the term and the base IRI of the resp. namespace module:
+Though strongly discouraged, a vocabulary namespace can be defined as non-strict with the `strict` option set to `false`. A non-strict vocabulary doesn't require any terms to be defined (although they can). A term is resolved dynamically at runtime by concatenation of the term and the base IRI of the resp. namespace module:
 
 ```elixir
 defmodule YourApp.NS do
@@ -165,8 +165,8 @@ iex> EX.bar
 ~I<http://www.example.com/ns/bar>
 
 iex> EX.Foo |> EX.bar(EX.Baz)
-#RDF.Description{subject: ~I<http://www.example.com/ns/Foo>
-     ~I<http://www.example.com/ns/bar>
-         ~I<http://www.example.com/ns/Baz>}
+#RDF.Description
+<http://example.com/Foo>
+    <http://example.com/bar> <http://example.com/Baz> .
 ```
 

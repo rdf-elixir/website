@@ -65,7 +65,7 @@ This form of passing the input data directly has one caveat: the input form of g
 |> RDF.Graph.new()
 ```
 
-For this reason the usage of the `:init` option variant is the recommended way to populate the data structures on construction. Use the direct passing variant only when you want to call the constructors in a pipeline and are sure that input of this form won't occur. 
+For this reason the usage of the `:init` option variant is the recommended way to populate the data structures on construction. Use the direct passing variant only when you want to call the constructors in a pipeline and are sure that input in this form won't occur. 
 
 A workaround if you really want to use this variant and can't exclude this form is to explicitly pass options:
 
@@ -196,29 +196,37 @@ Finally, lists of all the mentioned forms are accepted as input on the RDF data 
 RDF statements can be added to the data structures with various functions, all which support all of the input forms introduced in the last section. Let's first define some example data structures on which we can exemplify the differences of the different functions.
 
 ```elixir
-description = EX.S |> EX.p1(EX.O1) |> EX.p2(EX.O2) 
-graph = RDF.graph(description)
+iex> description = EX.S |> EX.p1(EX.O1) |> EX.p2(EX.O2) 
+#RDF.Description
+<http://example.com/S>
+    <http://example.com/p1> <http://example.com/O1> ;
+    <http://example.com/p2> <http://example.com/O2> .
+
+iex> graph = RDF.graph(description, prefixes: [ex: EX])
+#RDF.Graph name: nil
+@prefix ex: <http://example.com/> .
+
+ex:S
+    ex:p1 ex:O1 ;
+    ex:p2 ex:O2 .
 ```
 
 The `add/3` functions of the RDF data structures merge the given statements with the existing ones.
 
 ```elixir
 iex> RDF.Description.add(description, {EX.S, EX.p1, EX.New})
-#RDF.Description{subject: ~I<http://example.com/S>
-     ~I<http://example.com/p1>
-         ~I<http://example.com/O1>
-         ~I<http://example.com/New>
-     ~I<http://example.com/p2>
-         ~I<http://example.com/O2>}
+#RDF.Description
+<http://example.com/S>
+    <http://example.com/p1> <http://example.com/New>, <http://example.com/O1> ;
+    <http://example.com/p2> <http://example.com/O2> .
 
 iex> RDF.Graph.add(graph, %{EX.S => %{p1: EX.O}}, context: %{p1: EX.p1})
-#RDF.Graph{name: nil
-     ~I<http://example.com/S>
-         ~I<http://example.com/p1>
-             ~I<http://example.com/O>
-             ~I<http://example.com/O1>
-         ~I<http://example.com/p2>
-             ~I<http://example.com/O2>
+#RDF.Graph name: nil
+@prefix ex: <http://example.com/> .
+
+ex:S
+    ex:p1 ex:O, ex:O1 ;
+    ex:p2 ex:O2 .
 ```
 
 The `put/3` functions on the other hand overwrite existing statements, but behave differently in their overwriting behavior depending on the respective RDF data structure:
@@ -228,66 +236,68 @@ The `put/3` functions on the other hand overwrite existing statements, but behav
 
 ```elixir
 iex> RDF.Description.put(description, {EX.S, EX.p1, EX.New})
-#RDF.Description{subject: ~I<http://example.com/S>
-     ~I<http://example.com/p1>
-         ~I<http://example.com/New>
-     ~I<http://example.com/p2>
-         ~I<http://example.com/O2>}
+#RDF.Description
+<http://example.com/S>
+    <http://example.com/p1> <http://example.com/New> ;
+    <http://example.com/p2> <http://example.com/O2> .
 
 iex> RDF.Graph.put(graph, %{EX.S => %{p1: EX.New}}, context: %{p1: EX.p1})
-#RDF.Graph{name: nil
-     ~I<http://example.com/S>
-         ~I<http://example.com/p1>
-             ~I<http://example.com/New>
+#RDF.Graph name: nil
+@prefix ex: <http://example.com/> .
+
+ex:S
+    ex:p1 ex:New .
 ```
 
 If you want to add statements to an `RDF.Graph` or `RDF.Dataset` with the same overwrite behavior as `RDF.Description.put/3`, i.e. only overwrite the statements with the same subject and predicate, you can use the `RDF.Graph.put_properties/3` and `RDF.Dataset.put_properties/3` functions.
 
 ```elixir
 iex> RDF.Graph.put_properties(graph, %{EX.S => %{p1: EX.New}}, context: %{p1: EX.p1})
-#RDF.Graph{name: nil
-     ~I<http://example.com/S>
-         ~I<http://example.com/p1>
-             ~I<http://example.com/New>
-         ~I<http://example.com/p2>
-             ~I<http://example.com/O2>}
+#RDF.Graph name: nil
+@prefix ex: <http://example.com/> .
+
+ex:S
+    ex:p1 ex:New ;
+    ex:p2 ex:O2 .
 ```
 
 As mentioned in the last section, When the subject of a statement doesn't match the subject of a description, `RDF.Description.add/3` ignores it and is a no-op, but when given a `RDF.Description` to add it ignores its subject and just adds its property-value pairs, because this is a common use case when merging the descriptions of differently named resources.
 
 ```elixir
 iex> description = RDF.description(EX.S, init: {EX.p, EX.O1})
-#RDF.Description{subject: ~I<http://example.com/S>
-     ~I<http://example.com/p>
-         ~I<http://example.com/O1>}
+#RDF.Description
+<http://example.com/S>
+    <http://example.com/p> <http://example.com/O1> .
 
 iex> RDF.Description.add(description, {EX.Other, EX.p, EX.O2})
-#RDF.Description{subject: ~I<http://example.com/S>
-     ~I<http://example.com/p>
-         ~I<http://example.com/O1>}
+#RDF.Description
+<http://example.com/S>
+    <http://example.com/p> <http://example.com/O1> .
 
 iex> RDF.Description.add(description, RDF.description(EX.Other, init: {EX.p, EX.O2}))
-#RDF.Description{subject: ~I<http://example.com/S>
-     ~I<http://example.com/p>
-         ~I<http://example.com/O1>
-         ~I<http://example.com/O2>}
+#RDF.Description
+<http://example.com/S>
+    <http://example.com/p> <http://example.com/O1>, <http://example.com/O2> .
 ```
 
 Since `put/3` is a destructive operation, `RDF.Description.put/3` does not replicate the behavior of `RDF.Description.add/3` to ignore the subject of descriptions. If you really want to overwrite the statements of a description with the ones from another description with `put/3` you'll have to explicitly change the subject of the input description with `RDF.Description.change_subject/2`.
 
 ```elixir
 iex> other_description = RDF.description(EX.Other, init: {EX.p, EX.O2})
+#RDF.Description
+<http://example.com/Other>
+    <http://example.com/p> <http://example.com/O2> .
 
 iex> RDF.Description.put(description, other_description)
-#RDF.Description{subject: ~I<http://example.com/S>
-     ~I<http://example.com/p>
-         ~I<http://example.com/O1>}
+#RDF.Description
+<http://example.com/S>
+    <http://example.com/p> <http://example.com/O1> .
 
 iex> RDF.Description.put(description, 
 ...>   RDF.Description.change_subject(other_description, description.subject))
-#RDF.Description{subject: ~I<http://example.com/S>
-     ~I<http://example.com/p>
-         ~I<http://example.com/O2>}
+#RDF.Description
+<http://example.com/S>
+    <http://example.com/p> <http://example.com/O2> .
 ```
 
 As most of the functions of `RDF.Dataset` the functions for adding statements have essentially two modes in which they operate:
@@ -301,50 +311,46 @@ iex> dataset = RDF.dataset([
 ...>   (EX.S1 |> EX.p1(EX.O1)),
 ...>   {EX.S2, EX.p2, EX.O2, EX.Graph}
 ...> ])
-#RDF.Dataset{name: nil
-     #RDF.Graph{name: nil
-          ~I<http://example.com/S1>
-              ~I<http://example.com/p1>
-                  ~I<http://example.com/O1>}
-     #RDF.Graph{name: ~I<http://example.com/Graph>
-          ~I<http://example.com/S2>
-              ~I<http://example.com/p2>
-                  ~I<http://example.com/O2>}}
+%RDF.Dataset{name: nil, graph_names: [nil, ~I<http://example.com/Graph>]}
 
+iex> RDF.Dataset.default_graph(dataset)
+#RDF.Graph name: nil
+<http://example.com/S1>
+    <http://example.com/p1> <http://example.com/O1> .
 
-iex> RDF.Dataset.add(dataset, [
-...>   {EX.S1, EX.p1, "new"},
-...>   {EX.S2, EX.p2, "new", EX.Graph}
-...> ])
-#RDF.Dataset{name: nil
-     #RDF.Graph{name: nil
-          ~I<http://example.com/S1>
-              ~I<http://example.com/p1>
-                  %RDF.Literal{literal: %RDF.XSD.String{value: "new", lexical: "new"}, valid: true}
-                  ~I<http://example.com/O1>}
-     #RDF.Graph{name: ~I<http://example.com/Graph>
-          ~I<http://example.com/S2>
-              ~I<http://example.com/p2>
-                  %RDF.Literal{literal: %RDF.XSD.String{value: "new", lexical: "new"}, valid: true}
-                  ~I<http://example.com/O2>}}
+iex> RDF.Dataset.graph(dataset, EX.Graph)
+#RDF.Graph name: ~I<http://example.com/Graph>
+<http://example.com/S2>
+    <http://example.com/p2> <http://example.com/O2> .
 
 iex> RDF.Dataset.add(dataset, [
 ...>   {EX.S1, EX.p1, "new"},
 ...>   {EX.S2, EX.p2, "new", EX.Graph}
-...> ], graph: nil)
-#RDF.Dataset{name: nil
-     #RDF.Graph{name: nil
-          ~I<http://example.com/S1>
-              ~I<http://example.com/p1>
-                  %RDF.Literal{literal: %RDF.XSD.String{value: "new", lexical: "new"}, valid: true}
-                  ~I<http://example.com/O1>
-          ~I<http://example.com/S2>
-              ~I<http://example.com/p2>
-                  %RDF.Literal{literal: %RDF.XSD.String{value: "new", lexical: "new"}, valid: true}}
-     #RDF.Graph{name: ~I<http://example.com/Graph>
-          ~I<http://example.com/S2>
-              ~I<http://example.com/p2>
-                  ~I<http://example.com/O2>}}
+...> ]) |> RDF.Dataset.graphs()
+[#RDF.Graph name: nil
+<http://example.com/S1>
+    <http://example.com/p1> "new", <http://example.com/O1> .
+,
+#RDF.Graph name: ~I<http://example.com/Graph>
+<http://example.com/S2>
+    <http://example.com/p2> "new", <http://example.com/O2> .
+]
+
+iex> RDF.Dataset.add(dataset, [
+...>   {EX.S1, EX.p1, "new"},
+...>   {EX.S2, EX.p2, "new", EX.Graph}
+...> ], graph: nil) |> RDF.Dataset.graphs()
+[#RDF.Graph name: nil
+<http://example.com/S1>
+    <http://example.com/p1> "new", <http://example.com/O1> .
+
+<http://example.com/S2>
+    <http://example.com/p2> "new" .
+,
+ #RDF.Graph name: ~I<http://example.com/Graph>
+<http://example.com/S2>
+    <http://example.com/p2> <http://example.com/O2> .
+]
 ```
 
 
@@ -366,20 +372,17 @@ iex> RDF.description(EX.S, init: {EX.p, 42})
 ...> |> RDF.Description.update(EX.p, fn [object] -> 
 ...>      XSD.Integer.value(object) + 1 
 ...> end)
-#RDF.Description{subject: ~I<http://example.com/S>
-     ~I<http://example.com/p>
-         %RDF.Literal{literal: %RDF.XSD.Integer{value: 43, lexical: "43"}, valid: true}}
+#RDF.Description
+<http://example.com/S>
+    <http://example.com/p> 43 .
 
 iex> RDF.graph({EX.S, EX.p, EX.O})
 ...> |> RDF.Graph.update(EX.S,
 ...>      fn description -> Description.add(description, {EX.p, EX.O2})
 ...>    end)
-#RDF.Graph{name: nil
-     ~I<http://example.com/S>
-         ~I<http://example.com/p>
-             ~I<http://example.com/O>
-             ~I<http://example.com/O2>}
-
+#RDF.Graph name: nil
+<http://example.com/S>
+    <http://example.com/p> <http://example.com/O>, <http://example.com/O2> .
 ```
 
 The optional third argument allows to specify a default value which should be set in case no value to be updated exist for the given element.
@@ -387,9 +390,9 @@ The optional third argument allows to specify a default value which should be se
 ```elixir
 iex> RDF.description(EX.S)
 ...> |> RDF.Description.update(EX.p, EX.O, fn _ -> EX.O2 end)
-#RDF.Description{subject: ~I<http://example.com/S>
-     ~I<http://example.com/p>
-         ~I<http://example.com/O>}
+#RDF.Description
+<http://example.com/S>
+    <http://example.com/p> <http://example.com/O> .
 ```
 
 
@@ -569,9 +572,9 @@ Statements can be deleted in two slightly different ways. One way is to use the 
 ```elixir
 iex> RDF.Description.new(EX.S1, init: {EX.p, [EX.O1, EX.O2]})
 ...> |> RDF.Description.delete({EX.S1, EX.p, EX.O1})
-#RDF.Description{subject: ~I<http://example.com/S1>
-     ~I<http://example.com/p>
-         ~I<http://example.com/O2>}
+#RDF.Description
+<http://example.com/S1>
+    <http://example.com/p> <http://example.com/O2> .
 ```
 
 Another way to delete statements is the `delete/3` function of the `RDF.Data` protocol. The only difference to `delete` functions on the data structures directly is how it handles the deletion of a `RDF.Description` from another `RDF.Description` or `RDF.Graph` from another `RDF.Graph`. While the dedicated RDF data structure function ignores the description subject or graph name and removes the statements even when they don't match, `RDF.Data.delete/3` only deletes when the description’s subject respective graph name matches.
@@ -579,16 +582,15 @@ Another way to delete statements is the `delete/3` function of the `RDF.Data` pr
 ```elixir
 iex> RDF.Description.new(EX.S1, init: {EX.p, [EX.O1, EX.O2]})
 ...> |> RDF.Description.delete(RDF.Description.new(EX.S2, init: {EX.p, EX.O1}))
-#RDF.Description{subject: ~I<http://example.com/S1>
-     ~I<http://example.com/p>
-         ~I<http://example.com/O2>}
+#RDF.Description
+<http://example.com/S1>
+    <http://example.com/p> <http://example.com/O2> .
 
 iex> RDF.Description.new(EX.S1, init: {EX.p, [EX.O1, EX.O2]})
-...> |> RDF.Data.delete(RDF.Description.new(EX.S2, {EX.p, EX.O1}))
-#RDF.Description{subject: ~I<http://example.com/S1>
-     ~I<http://example.com/p>
-         ~I<http://example.com/O1>
-         ~I<http://example.com/O2>}
+...> |> RDF.Data.delete(RDF.Description.new(EX.S2, init: {EX.p, EX.O1}))
+#RDF.Description
+<http://example.com/S1>
+    <http://example.com/p> <http://example.com/O1>, <http://example.com/O2> .
 ```
 
 Beyond that, there are:
