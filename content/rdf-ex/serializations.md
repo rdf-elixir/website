@@ -1,10 +1,10 @@
 # Serializations
 
 The RDF.ex package comes with implementations of the [N-Triples](https://www.w3.org/TR/n-triples/), [N-Quads](https://www.w3.org/TR/n-quads/) and [Turtle](https://www.w3.org/TR/turtle/) serialization formats. 
-Formats which require additional dependencies should be implemented in separate Hex packages.
-The [JSON-LD](http://www.w3.org/TR/json-ld/) format for example is available with the [JSON-LD.ex](https://hex.pm/packages/json_ld) package.
+Formats which require additional dependencies are implemented in separate Hex packages.
+The [JSON-LD](http://www.w3.org/TR/json-ld/) format for example is available with the [JSON-LD.ex](https://hex.pm/packages/json_ld) package and the [RDF-XML](http://www.w3.org/TR/rdf-syntax-grammar/) format is available with the [RDF-XML.ex](https://hex.pm/packages/rdf_xml) package.
 
-RDF graphs and datasets can be read and written to files or strings in a RDF serialization format using the  `read_file`, `read_string` and `write_file`, `write_string` functions of the resp. `RDF.Serialization.Format` module.
+RDF graphs and datasets can be read and written to files, strings or streams in a RDF serialization format using the  `read_file/2`, `read_string/2`, `read_stream/2` and the `write_file/3`, `write_string/2` and `write_stream/2` functions of the resp. `RDF.Serialization.Format` module.
 
 ```elixir
 {:ok, graph} = RDF.NTriples.read_file("/path/to/some_file.nt")
@@ -28,6 +28,33 @@ The file read and write functions are also able to infer the format from the fil
 RDF.read_file!("/path/to/some_file.ttl")
 |> RDF.write_file!("/path/to/some_file.jsonld")
 ```
+
+
+## Streaming
+
+Some of the available serialization formats also provide support for reading serializations from files and writing serializations to streams. At the moment these are the builtin N-Triples and N-Quads formats and the RDF-XML format. For those you have the `read_stream/2`, `read_stream!/2`  and `write_stream/2` functions available.
+
+```elixir
+graph = RDF.XML.read_stream!(xml_stream)
+xml_stream = RDF.XML.write_stream(graph)
+```
+
+Note, that there's no `write_stream!/2` function. Since it's not possible to determine upfront, if anything will be ok with the stream, `write_stream/2` behaves like the other bang variants: It returns the stream directly and errors during consumption of the stream will raise an error.
+
+Many times you'll want read streams from the contents of file or write streams whose content is written to a file. In these cases you don't have to reach for the stream functions, but can use the file read and write functions instead. For formats with streaming support they use streaming by default, except for `write_file/3`. For the same reason as above only `write_file!/3` use streams by default. But you can use the `:stream` option to opt-in on `write_file/3` or opt-out on the other functions.
+
+
+## File compression
+
+Both file reader and writer functions support a `gzip` option which allows to read and write from and to gzip'ed files directly.
+
+```elixir
+RDF.NTriples.read_file!("/path/to/some_file.nt.gz")
+|> RDF.XML.write_file!("/path/to/some_file.rdf.gz")
+```
+
+Note, that this can also be combined with file access via streams.
+
 
 ## Base IRI
 
