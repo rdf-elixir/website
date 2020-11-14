@@ -6,6 +6,7 @@ sidebar: false
 
 - [RDF.ex](https://hex.pm/packages/rdf)
 - [JSON-LD.ex](https://hex.pm/packages/json_ld)
+- [RDF-XML.ex](https://hex.pm/packages/rdf_xml)
 - [SPARQL.ex](https://hex.pm/packages/sparql)
 - [SPARQL.Client](https://hex.pm/packages/sparql_client)
 - [ShEx.ex](https://hex.pm/packages/shex)
@@ -16,6 +17,7 @@ sidebar: false
 
 - [RDF.ex](https://github.com/rdf-elixir/rdf-ex)
 - [JSON-LD.ex](https://github.com/rdf-elixir/jsonld-ex)
+- [RDF-XML.ex](https://github.com/rdf-elixir/rdf-xml-ex)
 - [SPARQL.ex](https://github.com/rdf-elixir/sparql-ex)
 - [SPARQL.Client](https://github.com/rdf-elixir/sparql_client)
 - [ShEx.ex](https://github.com/rdf-elixir/shex-ex)

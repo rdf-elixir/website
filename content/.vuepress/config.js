@@ -44,6 +44,8 @@ function getNav () {
         navItem('SPARQL.ex', 'https://hexdocs.pm/sparql/'),
         navItem('SPARQL.Client', 'https://hexdocs.pm/sparql_client/'),
         navItem('ShEx.ex', 'https://hexdocs.pm/shex/'),
+        navItem('JSON-LD.ex', 'https://hexdocs.pm/json_ld/'),
+        navItem('RDF-XML.ex', 'https://hexdocs.pm/rdf_xml/')
       ]
     },
     navItem('Links', '/links')
