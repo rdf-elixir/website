@@ -38,6 +38,7 @@ function getNav () {
     navItem('RDF.ex', '/rdf-ex/'),
     navItem('SPARQL.ex', '/sparql-ex/'),
     navItem('ShEx.ex', '/shex-ex/'),
+    navItem('Grax', '/grax/'),
     {
       text: 'API Documentation', items: [
         navItem('RDF.ex', 'https://hexdocs.pm/rdf/'),
@@ -65,7 +66,7 @@ function getSidebar () {
     '/rdf-ex/': getRDFSidebar(),
     '/sparql-ex/': getSPARQLSidebar(),
     '/shex-ex/': getShExSidebar(),
-    
+    '/grax/': getGraxSidebar()
   }
 }
 
@@ -121,6 +122,21 @@ function getShExSidebar () {
         'shape-maps',
         'validation',
         'limitations',
+      ]
+    }
+  ]
+}
+
+function getGraxSidebar () {
+  return [
+    {
+      title: 'Grax',
+      collapsable: false,
+      children: [
+        '',
+        'installation',
+        'schemas',
+        'api'
       ]
     }
   ]
