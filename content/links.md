@@ -26,6 +26,7 @@ sidebar: false
 
 # Social channels
 
+- [RDF on Elixir discussion board](https://github.com/rdf-elixir/rdf-ex/discussions)
 - [Elixir in the RDF.community forum](https://discuss.rdf.community/c/rdf-tooling-libraries/elixir)
 - [elixir-lang Slack channel](https://elixir-lang.slack.com/messages/CHER4LCNM)
 - [Twitter](https://twitter.com/MarcelOttoDE)
