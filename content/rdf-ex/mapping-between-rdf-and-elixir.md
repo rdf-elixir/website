@@ -1,5 +1,11 @@
 # Mapping of RDF terms and structures
 
+::: tip
+
+If you're looking for a way to map `RDF.Graph`s or `RDF.Description`s to Elixir structs, you might be interested in [Grax](/grax/).
+
+:::
+
 The `RDF.Term.value/1` function converts RDF terms to Elixir values:
 
 ```elixir
