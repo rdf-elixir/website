@@ -50,7 +50,7 @@ alias NS.EX
 ```
 
 
-These structs from RDF.ex are is the only RDF-related value you'll see in a Grax schema struct and it will be replaced with a more generic solution in the next version. The additional `__id__` field should be treated similarly as the internal `__struct__` field of Elixir structs: use it maybe for pattern matching, but don't touch it directly (other than via functions exposed by the API). 
+These structs from RDF.ex are the only RDF-related values you'll see in a Grax schema struct and will be replaced with a more generic solution in the next version. The additional `__id__` field should be treated similarly as the internal `__struct__` field of Elixir structs: use it maybe for pattern matching, but don't touch it directly (other than via functions exposed by the API). 
 
 ::: tip
 
@@ -124,12 +124,12 @@ All of these definition forms lead to structs like this:
 }
 ```
 
-The property is accessible as a usual field name of the struct, but has an exact RDF interpretation implicitly through the internal mapping to a RDF property identifier. These minimal forms without any further property specifications are already valid property definitions in Grax. Unlike an Ecto schema which requires a type specification, these structs are already fully functional. In a Grax schema the types are optional, just as RDF and most other graph models are at its core schema-free data models with optional types later on. 
+The property is accessible as a usual field name of the struct, but has an exact RDF interpretation implicitly through the internal mapping to a RDF property identifier. These minimal forms without any further property specifications are already valid property definitions in Grax. Unlike an Ecto schema, which requires a type specification, these structs are already fully functional. In a Grax schema the types are optional, just as RDF and most other graph models are at its core schema-free data models with optional types later on. 
 
 But before we bring types into the game, we'll have to differentiate two general kinds of properties: 
 
-1. **_data properties_** whose values we want to map to simple Elixir values like strings and integers etc.
-2. **_link properties_** (the _object properties_ of OWL), whose IRI or blank node values should be mapped to recursively nested `Grax.Schema` structs.
+1. **_Data properties_**, whose values we want to map to simple Elixir values, like strings and integers etc.
+2. **_Link properties_** (the _object properties_ of OWL), whose IRI or blank node values should be mapped to recursively nested `Grax.Schema` structs.
 
 Despite having very different kinds of values, there's one type dichotomy across both kinds of properties. We can have single values or sets of values.
 
@@ -237,7 +237,7 @@ Above these there are a couple of special datatypes:
 
 - The `:numeric` datatype behaves similar to the `:any` datatype, but limits the values to those of numeric datatypes.
 
-- The `:iri` datatype can be used if IRIs should be kept as they are, which is useful when they shouldn't be mapped to nested mapping structs (described in the next section on links).
+- The `:iri` datatype can be used if IRIs should be kept as they are, which is useful when they shouldn't be mapped to nested mapping structs.
 
 
 ### Default values
@@ -273,7 +273,7 @@ end
 
 Now, back to our two kinds of properties, we'll see how link properties are mapped on to our Grax schemas. 
 
-Link properties, further sometimes called more shortly links, are on the edges of a RDF graph between the inner nodes with URIs or blank nodes, as opposed to data properties which are on the edges to leaf nodes with RDF literals. Other than for data properties, the actual a node identifier like an URI or a blank node of a link property, is not of interest, but it's the description of the thing the identifier refers to. So, the values of link properties are not the URIs or blank nodes in the object position of a RDF statement, but another Grax schema with the properties of the referenced resource mapping the RDF description of the linked resource.
+Link properties, in the following sometimes called more shortly links, are on the edges of a RDF graph between the inner nodes with URIs or blank nodes, as opposed to data properties which are on the edges to leaf nodes with RDF literals. Other than for data properties, the actual a node identifier like an URI or a blank node of a link property, is not of interest, but it's the description of the thing the identifier refers to. So, the values of link properties are not the URIs or blank nodes in the object position of a RDF statement, but another Grax schema with the properties from the RDF description of the linked resource.
 
 Just like relational associations are in Ecto mapped to the struct fields through another Ecto schema for the associated table, the linked resources of a root resource are embedded into the struct in the respective field, where the properties of the linked resource are kept, potentially linking to other resources. So, the links allow us to traverse the nodes of a graph, as a tree structure down from a root resource and its fields of nested `Grax.Schema` structs.
 
@@ -340,7 +340,7 @@ So, our `User` struct now looks like this:
 }
 ```
 
-While you have to deal in Ecto with the relational data model with different types of associations and mappings in the relational data model (1-to-1, 1-to-n, n-to-m, with an implicit or explicit join-schema etc.), the graph data model just has edges with different kinds of cardinalities, which are in Grax mapped similarly to single value and values sets on data properties, to single link and link sets on link properties. 
+While you have to deal in Ecto with the relational data model with different types of associations and mappings in the relational data model (1-to-1, 1-to-n, n-to-m, with an implicit or explicit join-schema etc.), the graph data model just has edges with different kinds of cardinalities, which are in Grax mapped to either single values or a list of multiple values, just like data properties, only that it's now just single or multiple schema structs for the linked nodes.
 Just as for data properties single linked schema structs are assumed unless the module name of the schema on the `:type` keyword is put in square brackets. 
 
 ```elixir
@@ -365,16 +365,15 @@ But as you might see already with this link property, there's one problem we'll 
 
 ### Preloading 
 
-Preloading is the operation of populating a `Grax.Schema` struct by loading (mapping) the RDF descriptions of linked resources from a RDF graph 
- into a tree structure over the linked property fields of a `Grax.Schema`recursively.
+Preloading is the operation of populating a `Grax.Schema` struct by loading (mapping) the RDF descriptions of linked resources from a RDF graph into a tree structure over the linked property fields of a `Grax.Schema` recursively.
 
 You might have already asked yourself, how the recursive traversal of the graph for loading the nested schema of a root node is done and can be controlled. 
 For example on our `friends` link: How many levels of friends do we want to load and how do we handle circles?
 
-There are potentially several useful preloading strategies, which should be implemented in possible future versions. For now, the only preloading strategy supported is a pretty simple one, the depth-preloading strategy, where all of the properties and links up to a specified recursive depth are loaded. 
+There are potentially several useful preloading strategies, which should be implemented in possible future versions. For now, the only preloading strategy supported is a pretty simple one, the _depth preloading_ strategy, where all of the properties and links up to a specified recursive depth are loaded. 
 
-The default behaviour for how deep the links of a mapping struct are loaded can be specified on a `link` definition with the `:depth` keyword of the depth-preloading strategy and an integer for the preloading depth. 
-But before we look at a use of the `:depth` keyword let's see what happens if our address model would get further nested by decomposing one of its parts, eg. the country. 
+The default behaviour for how deep the links of a mapping struct are loaded can be specified on a `link` definition with the `:depth` keyword of the depth preloading strategy and an integer for the preloading depth. 
+But before we look at a use of the `:depth` keyword, let's see what happens if our address model would get further nested by decomposing one of its parts, eg. the country. 
 
 ```elixir
 defmodule User do
@@ -438,7 +437,7 @@ The default value for `:depth` is `1`. This means all of the data and object pro
 The default value of all link property fields on the struct is a `Grax.Link.NotLoaded` exception struct.
 If you've got a `Grax.Schema` struct with a value like this on the link field and want to access it, you'll have to do an explicit call of the `Grax.preload/3` function described in the next chapter about the API.
 
-But to ensure a proper processing of the Grax schema structs which might expect certain fields in deeper layers of the struct, you don't want to have to deal with exceptions and do a manual preload, when you can expect them generally. In cases like this you can enforce the depth of the preloading with the `:depth` keyword. This can be achieved in multiple ways.
+But to ensure a proper processing of the Grax schema structs, which might expect certain fields in deeper layers of the struct, you don't want to have to deal with exceptions and do a manual preload, when you can expect them generally. In cases like this, you can enforce the depth of the preloading with the `:depth` keyword. This can be achieved in multiple ways.
  
 The first approach might be to increase the depth on the `address` link to 2. 
 
@@ -493,7 +492,7 @@ Given respective data in a source graph our `User` struct could now look like th
 ```
 
 But we would get this result only if the `User` struct is the root resource.
-A normal preloading depth integer value is interpreted against the root element. This means when loading the schema from a graph only the specified number of depth levels of the neighbourhood of the root resource is relevant. The preloading depth specified in the schema of a linked resource is not taken into account and doesn't increase the overall preloading depth. This can be achieved however, by specifying a preloading depth with a plus sign before the `:depth` integer value, like `depth: +1` . This _additive_ preloading depth will ensure that these resources are preloaded with the specified level even when the specified depth of the outer schema would specify otherwise.
+A normal preloading depth integer value is interpreted against the root element. This means, when loading the schema from a graph, only the specified `:depth` of the root resource is relevant. The `:depth` specified in the schema of a linked resource is not taken into account and doesn't increase the overall preloading depth. This can be achieved however, by specifying a preloading depth with a plus sign before the `:depth` integer value, like `depth: +1` . This _additive_ preloading depth will ensure that these resources are preloaded with the specified level even when the `:depth` of the outer schema would specify otherwise.
 So, this essentially overwrites the preloading depth specification of the parent schema.
 
 Back to our example, when we generally expect that code dealing with an address in our application is interested in the properties of the country, we want to achieve that the country is always preloaded with the address, independent of whether it is preloaded as part of another resource. This can be specified with an additive preloading depth.
@@ -558,15 +557,11 @@ defmodule Address do
 end
 ```
 
-But additive preloading depths can lead to infinite preloadings circles. This is prohibited by stopping with the preloading down a path, when the first already preloaded element on this path reoccurs.
+But additive preloading depths can lead to infinite preloading circles. This is prohibited by stopping with the preloading down a path, when the first already preloaded element on this path reoccurs.
 
-On `load/2` calls the preloading can be configured also
-
-The is a pretty greedy preloading strategy. But in the first version, which is limited to working on in-memory RDF.ex graphs, where loading is quite fast and the data access doesn't require any further IO, this simple strategy gets us already quite far.
-
-Although simple, it should be usable in some cases. Especially with the capability to override preloading settings on individual API calls at any time.
-
-But again, this was just the easy, lowest-hanging fruit of a strategy for a preloading algorithm. What we definitely want is for example query pattern-based or path-based preloading or that data properties can be defined that fetch values from the neighbourhood of a node directly into a schema, which will hopefully will be available in future versions.
+This a pretty greedy preloading strategy. But in the first version, which is limited to working on in-memory RDF.ex graphs, where loading is quite fast and the data access doesn't require any further IO, this simple strategy gets us already quite far.
+Although simple, it should be usable in some cases, especially with the capability to override preloading settings on individual API calls at any time.
+But again, this was just the easy, lowest hanging fruit of a strategy for a preloading algorithm. What we definitely want is for example query pattern-based or path-based preloading or that data properties can be defined that fetch values from the neighbourhood of a node directly into a schema, which will hopefully be available in future versions.
 
 
 ### Inverse property links
@@ -635,7 +630,7 @@ defmodule Address do
 end
 ```
 
-For now, the only effect that a class-declaration has is, that the mapping to RDF graphs will produce a `rdf:type` statement accordingly. In particular it doesn't mean that the RDF description of a resource must include a respective `rdf:type` to be loadable into a `Grax.Schema` struct.
+For now, the only effect of a class declaration is that the mapping to RDF graphs will produce a `rdf:type` statement accordingly. In particular it doesn't mean that the RDF description of a resource must include a respective `rdf:type` to be loadable into a `Grax.Schema` struct.
 
 
 ## Custom fields
@@ -684,7 +679,7 @@ The return value can be either:
 - a three-element `:ok` tuple with the mapped RDF values on second position and a list of additional RDF statements which should be added to the produced graph on the third position (the statements can be given in any form accepted by `RDF.Graph.add/2`)
 - an `:error` tuple with an error
 
-For both custom mapping function you can return `nil` as a value when no values should be produced by the mapping.
+For both custom mapping functions you can return `nil` as a value when no values should be produced by the mapping.
 
 
 ```elixir
@@ -715,4 +710,4 @@ defmodule User do
 end
 ```
 
-Note, that if you provide both `from_rdf` and `to_rdf` functions, you can use any type of value on this property, even ones for which no corresponding datatype is supported. But if the value(s) produced by `from_rdf` and kept in the struct is covered by a supported a datatype it can still be useful to specify a `type` to benefit from the performed validations.
+Note, that if you provide both `from_rdf` and `to_rdf` functions, you can use any type of value on this property, even ones for which no corresponding datatype is supported. 
