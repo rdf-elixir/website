@@ -5,7 +5,7 @@ A **_Grax schema_** is just an Elixir struct.  In a traditional application, bac
 But while Ecto maps data from relational databases, Grax maps data from graph databases to Elixir structs. Graph databases are based on the graph data model, which has less technical friction between the conceptual model of the humans and the data model for the machine as it is perfectly [demonstrated here](https://youtu.be/cHXbYLNa0qQ?t=290). By reducing the barrier between your conceptual models and the data models for your application, you have less to think about technical details and can spend more time on thinking about the actual domain model of the business problems your application has to solve.
 You've might have already got a feel of this, when working with GraphQL, you simply define the nested schemas of a tree.
 
-How does a `Grax.Schema` definition look like? As an example, let's assume we have a RDF graph like this, which we want to map to Elixir structs with Elixir values for an Elixir application:
+How does a `Grax.Schema` definition look like? As an example, let's assume we have an RDF graph like this, which we want to map to Elixir structs with Elixir values for an Elixir application:
 
 ```
 @prefix : <http://example.com/> .
@@ -40,7 +40,7 @@ defmodule User do
 end
 ```
 
-This will define a struct on the `User` module. Although this struct doesn't have any user-defined fields for the domain model of our application yet, this could already represent a RDF graph node, since every `Grax.Schema` struct has at least an internal `__id__`  field, which contains the `RDF.IRI` or `RDF.BlankNode`, mapping to a graph node. So, an instance of this struct would look like this:
+This will define a struct on the `User` module. Although this struct doesn't have any user-defined fields for the domain model of our application yet, this could already represent an RDF graph node, since every `Grax.Schema` struct has at least an internal `__id__`  field, which contains the `RDF.IRI` or `RDF.BlankNode`, mapping to a graph node. So, an instance of this struct would look like this:
 
 ```elixir
 alias NS.EX
@@ -79,7 +79,7 @@ end
 
 This will add an additional field on the Grax schema struct with the given name. The URI of the RDF property will be backed into the Grax schema struct. You won't have to deal with the URIs of the RDF properties furthermore. It will be automatically used for the mapping from and to RDF.
 
-The URI can be given in any form the `RDF.IRI.new/1` constructor of RDF.ex can create IRIs from, including IRIs directly (eg. via IRI sigils), strings or terms from a RDF.ex vocabulary namespace.
+The URI can be given in any form the `RDF.IRI.new/1` constructor of RDF.ex can create IRIs from, including IRIs directly (eg. via IRI sigils), strings or terms from an RDF.ex vocabulary namespace.
 
 
 ```elixir
@@ -124,7 +124,7 @@ All of these definition forms lead to structs like this:
 }
 ```
 
-The property is accessible as a usual field name of the struct, but has an exact RDF interpretation implicitly through the internal mapping to a RDF property identifier. These minimal forms without any further property specifications are already valid property definitions in Grax. Unlike an Ecto schema, which requires a type specification, these structs are already fully functional. In a Grax schema the types are optional, just as RDF and most other graph models are at its core schema-free data models with optional types later on. 
+The property is accessible as a usual field name of the struct, but has an exact RDF interpretation implicitly through the internal mapping to an RDF property identifier. These minimal forms without any further property specifications are already valid property definitions in Grax. Unlike an Ecto schema, which requires a type specification, these structs are already fully functional. In a Grax schema the types are optional, just as RDF and most other graph models are at its core schema-free data models with optional types later on. 
 
 But before we bring types into the game, we'll have to differentiate two general kinds of properties: 
 
@@ -273,7 +273,7 @@ end
 
 Now, back to our two kinds of properties, we'll see how link properties are mapped on to our Grax schemas. 
 
-Link properties, in the following sometimes called more shortly links, are on the edges of a RDF graph between the inner nodes with URIs or blank nodes, as opposed to data properties which are on the edges to leaf nodes with RDF literals. Other than for data properties, the actual a node identifier like an URI or a blank node of a link property, is not of interest, but it's the description of the thing the identifier refers to. So, the values of link properties are not the URIs or blank nodes in the object position of a RDF statement, but another Grax schema with the properties from the RDF description of the linked resource.
+Link properties, in the following sometimes called more shortly links, are on the edges of an RDF graph between the inner nodes with URIs or blank nodes, as opposed to data properties which are on the edges to leaf nodes with RDF literals. Other than for data properties, the actual a node identifier like an URI or a blank node of a link property, is not of interest, but it's the description of the thing the identifier refers to. So, the values of link properties are not the URIs or blank nodes in the object position of an RDF statement, but another Grax schema with the properties from the RDF description of the linked resource.
 
 Just like relational associations are in Ecto mapped to the struct fields through another Ecto schema for the associated table, the linked resources of a root resource are embedded into the struct in the respective field, where the properties of the linked resource are kept, potentially linking to other resources. So, the links allow us to traverse the nodes of a graph, as a tree structure down from a root resource and its fields of nested `Grax.Schema` structs.
 
@@ -365,7 +365,7 @@ But as you might see already with this link property, there's one problem we'll 
 
 ### Preloading 
 
-Preloading is the operation of populating a `Grax.Schema` struct by loading (mapping) the RDF descriptions of linked resources from a RDF graph into a tree structure over the linked property fields of a `Grax.Schema` recursively.
+Preloading is the operation of populating a `Grax.Schema` struct by loading (mapping) the RDF descriptions of linked resources from an RDF graph into a tree structure over the linked property fields of a `Grax.Schema` recursively.
 
 You might have already asked yourself, how the recursive traversal of the graph for loading the nested schema of a root node is done and can be controlled. 
 For example on our `friends` link: How many levels of friends do we want to load and how do we handle circles?
@@ -602,7 +602,7 @@ end
 
 ## Class declarations
 
-You can optionally specify that the individual `Grax.Schema` structs representing RDF resources should be instances of a RDFS class by providing its IRI as an argument of the `schema` macro.
+You can optionally specify that the individual `Grax.Schema` structs representing RDF resources should be instances of an RDFS class by providing its IRI as an argument of the `schema` macro.
 
 ```elixir{4,12,20}
 defmodule User do

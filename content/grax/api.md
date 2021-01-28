@@ -74,7 +74,7 @@ end
 
 ## Loading from RDF graphs
 
-You can load a `Grax.Schema` struct from the description in a RDF graph with the `Grax.load/3` function, which expects 
+You can load a `Grax.Schema` struct from the description in an RDF graph with the `Grax.load/3` function, which expects 
 
 1. the `Grax.Schema` struct module, 
 2. the identifier of the resource to be loaded and 
@@ -217,12 +217,12 @@ Note, that this function essentially overwrites everything accept the data prope
 
 ## Creation from scratch
 
-When a RDF description of a resource does not exist yet, but should be created in the application, the `build` functions can be used. Similar to the `load` functions there is also a bang-variant and as it requires the `Grax.Schema` module as the first argument too, there are are also dedicated functions of both `build` functions without this argument on the `Grax.Schema` modules available. The other required argument then remains the resource identifier.
+When an RDF description of a resource does not exist yet, but should be created in the application, the `build` functions can be used. Similar to the `load` functions there is also a bang-variant and as it requires the `Grax.Schema` module as the first argument too, there are are also dedicated functions of both `build` functions without this argument on the `Grax.Schema` modules available. The other required argument then remains the resource identifier.
 
 ```elixir
 iex> User.build!(EX.User2)
 %User{
-  __id__: ~I<http://example.com/User2>,
+  __id__: ~I<http://example.com/ex>,
   age: nil,
   customer_type: nil,
   email: [],
