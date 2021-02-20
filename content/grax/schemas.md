@@ -133,7 +133,7 @@ But before we bring types into the game, we'll have to differentiate two general
 
 Despite having very different kinds of values, there's one type dichotomy across both kinds of properties. We can have single values or sets of values.
 
-By default it is assumed that the value of every property is unique, unless specified otherwise. If multiple values are allowed, the specified datatype on the `:type` keyword must be put in square brackets. The values will then be kept in a list. If you want to specify that a property can have multiple values of any datatype you can do so with `[:any]` or `[]`.
+By default it is assumed that the value of every property is unique, unless specified otherwise. If multiple values are allowed, a list type can be specified with the `list_of` type constructor function which expects the type of its elements. The values will then be kept in a list accordingly. If you want to specify that a property can have multiple values of any datatype you can use the `list` function.
 
 With that we can extend our example mapping schema like this:
 
@@ -145,7 +145,7 @@ defmodule User do
 
   schema do
     property name: SchemaOrg.name, type: :string
-    property emails: SchemaOrg.email, type: [:string]
+    property emails: SchemaOrg.email, type: list_of(:string)
   end
 end
 ```
@@ -159,6 +159,12 @@ Both email addresses from our example can now be represented in our `User` struc
   emails: ["jane@example.com", "jane@work.com"]
 }
 ```
+
+::: warning
+
+Although ordered lists are used for multiple values, the order is irrelevant since the values have no particular order in RDF. You should not rely on any particalur order. Similarly, as the values are essentially sets, duplicates are not allowed. They will be removed automatically.
+
+:::
 
 
 ## Data properties
@@ -175,7 +181,7 @@ defmodule User do
 
   schema do
     property name: SchemaOrg.name, type: :string
-    property emails: SchemaOrg.email, type: [:string]
+    property emails: SchemaOrg.email, type: list_of(:string)
     property age: FOAF.age, type: :integer
   end
 end
@@ -184,9 +190,7 @@ end
 The specified datatype defines what value a data property can have and which RDF datatype the produced literals for the RDF property should have. 
 The functions for working with these structs will validate the types of the values in the property fields in accordance with the datatype provided with the `:type` specification as described in the [Grax API section](/grax/api).
 
-
 The `User` structs now look like this:
-
 
 ```elixir
 %User{
@@ -233,7 +237,7 @@ The XSD date and time datatypes support also optional timezones, which are not s
 
 Above these there are a couple of special datatypes:
 
-- The `:any` datatype is the default when no datatype is specified  with the `:type` keyword. It means the property can contain values of any datatype. The datatype mapping from Elixir values to XSD datatypes as described in [the table here](/rdf-ex/literals.html#typed-literals) is applied in this case.
+- The `:any` datatype is the default when no datatype is specified with the `:type` keyword or is assumed for the the elements when using the `list` type constructor function. It means the property can contain values of any datatype. The datatype mapping from Elixir values to XSD datatypes as described in [the table here](/rdf-ex/literals.html#typed-literals) is applied in this case.
 
 - The `:numeric` datatype behaves similar to the `:any` datatype, but limits the values to those of numeric datatypes.
 
@@ -260,7 +264,7 @@ defmodule User do
 
   schema do
     property name: SchemaOrg.name, type: :string, required: true
-    property email: SchemaOrg.email, type: [:string], required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
   end
 end
@@ -289,7 +293,7 @@ defmodule User do
 
   schema do
     property name: SchemaOrg.name, type: :string, required: true
-    property email: SchemaOrg.email, type: [:string], required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
 
     link :address, SchemaOrg.address, type: Address
@@ -341,7 +345,7 @@ So, our `User` struct now looks like this:
 ```
 
 While you have to deal in Ecto with the relational data model with different types of associations and mappings in the relational data model (1-to-1, 1-to-n, n-to-m, with an implicit or explicit join-schema etc.), the graph data model just has edges with different kinds of cardinalities, which are in Grax mapped to either single values or a list of multiple values, just like data properties, only that it's now just single or multiple schema structs for the linked nodes.
-Just as for data properties single linked schema structs are assumed unless the module name of the schema on the `:type` keyword is put in square brackets. 
+Just as for data properties single linked schema structs are assumed unless it is list type is set on the  `:type` keyword with the `list_of` function and the module name of the schema. 
 
 ```elixir
 defmodule User do
@@ -351,11 +355,11 @@ defmodule User do
 
   schema do
     property name: SchemaOrg.name, type: :string, required: true
-    property email: SchemaOrg.email, type: [:string], required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
     
     link address: SchemaOrg.address, type: Address
-    link friends: FOAF.friend, type: [User]
+    link friends: FOAF.friend, type: list_of(User)
   end
 end
 ```
@@ -383,7 +387,7 @@ defmodule User do
 
   schema do
     property name: SchemaOrg.name, type: :string, required: true
-    property email: SchemaOrg.email, type: [:string], required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
 
     link :address, SchemaOrg.address, type: Address
@@ -449,7 +453,7 @@ defmodule User do
 
   schema do
     property name: SchemaOrg.name, type: :string, required: true
-    property email: SchemaOrg.email, type: [:string], required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
 
     link :address, SchemaOrg.address, type: Address, depth: 2
@@ -505,7 +509,7 @@ defmodule User do
 
   schema do
     property name: SchemaOrg.name, type: :string, required: true
-    property email: SchemaOrg.email, type: [:string], required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
 
     link :address, SchemaOrg.address, type: Address
@@ -536,7 +540,7 @@ defmodule User do
 
   schema do
     property name: SchemaOrg.name, type: :string, required: true
-    property email: SchemaOrg.email, type: [:string], required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
 
     link :address, SchemaOrg.address, type: Address
@@ -576,11 +580,11 @@ defmodule User do
 
   schema do
     property name: SchemaOrg.name, type: :string, required: true
-    property email: SchemaOrg.email, type: [:string], required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
     
-    link friends: FOAF.friend, type: [User]
-    link posts: -SchemaOrg.author, type: [Post]
+    link friends: FOAF.friend, type: list_of(User)
+    link posts: -SchemaOrg.author, type: list_of(Post)
   end
 end
 
@@ -593,7 +597,7 @@ defmodule Post do
     property title: SchemaOrg.name(), type: :string
     property content: SchemaOrg.articleBody(), type: :string
 
-    link author: SchemaOrg.author(), type: Example.User
+    link author: SchemaOrg.author(), type: User
   end
 end
 ```
@@ -645,7 +649,7 @@ defmodule User do
 
   schema do
     property name: SchemaOrg.name, type: :string, required: true
-    property email: SchemaOrg.email, type: [:string], required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
     
     field :password
@@ -690,15 +694,15 @@ defmodule User do
 
   schema SchemaOrg.Person do
     property name: SchemaOrg.name, type: :string, required: true
-    property email: SchemaOrg.email, type: [:string], required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
     property password: nil
     property customer_type: RDF.type, 
              from_rdf: :customer_type_from_rdf,
              to_rdf: :customer_type_to_rdf
     
-    link friends: FOAF.friend, type: [User]
-    link posts: -SchemaOrg.author, type: [Post]
+    link friends: FOAF.friend, type: list_of(User)
+    link posts: -SchemaOrg.author, type: list_of(Post)
   end
 
   def customer_type_from_rdf(types, _description, _graph) do

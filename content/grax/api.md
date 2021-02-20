@@ -39,15 +39,15 @@ defmodule User do
 
   schema SchemaOrg.Person do
     property :name, SchemaOrg.name, type: :string, required: true
-    property :email, SchemaOrg.email, type: [:string], required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
     property :age, FOAF.age, type: :integer
     property :password, nil
     property :customer_type, RDF.type, 
                from_rdf: :customer_type_from_rdf,
                to_rdf: :customer_type_to_rdf
     
-    link :friends, FOAF.friend, type: [User]
-    link :posts, -SchemaOrg.author, type: [Post]
+    link :friends, FOAF.friend, type: list_of(User)
+    link :posts, -SchemaOrg.author, type: list_of(Post)
   end
 
   def customer_type_from_rdf(types, _description, _graph) do
@@ -66,7 +66,7 @@ defmodule Post do
   schema do
     property :title, SchemaOrg.name(), type: :string
     property :content, SchemaOrg.articleBody(), type: :string
-    link :author, SchemaOrg.author(), type: Example.User
+    link :author, SchemaOrg.author(), type: User
   end
 end
 ```
