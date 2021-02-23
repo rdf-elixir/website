@@ -715,3 +715,38 @@ end
 ```
 
 Note, that if you provide both `from_rdf` and `to_rdf` functions, you can use any type of value on this property, even ones for which no corresponding datatype is supported. 
+
+Custom fields also support custom `:from_rdf` mappings. So, if you want to define a custom mapping to a field which should not be mapped back to RDF, you can do so with a custom field.
+
+The mapping functions can also be defined in a separate module by providing a tuple of the module and function name on the `:from_rdf` and `:to_rdf` options.
+
+```elixir
+defmodule User do
+  use Grax.Schema
+
+  alias NS.{SchemaOrg, FOAF, EX}
+
+  schema SchemaOrg.Person do
+    property name: SchemaOrg.name, type: :string, required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
+    property age: FOAF.age, type: :integer
+    property password: nil
+    property customer_type: RDF.type, 
+             from_rdf: {CustomMappings, :customer_type_from_rdf},
+             to_rdf: {CustomMappings, :customer_type_to_rdf}
+    
+    link friends: FOAF.friend, type: list_of(User)
+    link posts: -SchemaOrg.author, type: list_of(Post)
+  end
+
+end
+
+defmodule CustomMappings do
+  def customer_type_from_rdf(types, _description, _graph) do
+    {:ok, if(RDF.iri(EX.PremiumUser) in types, do: :premium_user)}
+  end
+
+  def customer_type_to_rdf(:premium_user, _user), do: {:ok, EX.PremiumUser}
+  def customer_type_to_rdf(_, _), do: {:ok, nil}
+end
+```
