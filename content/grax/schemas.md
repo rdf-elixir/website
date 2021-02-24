@@ -438,7 +438,7 @@ The default value for `:depth` is `1`. This means all of the data and object pro
 }
 ```
 
-The default value of all link property fields on the struct is a `Grax.Link.NotLoaded` exception struct.
+When loading a `Grax.Schema` struct the fields for the links which are not loaded are initialized with a `Grax.Link.NotLoaded` exception struct.
 If you've got a `Grax.Schema` struct with a value like this on the link field and want to access it, you'll have to do an explicit call of the `Grax.preload/3` function described in the next chapter about the API.
 
 But to ensure a proper processing of the Grax schema structs, which might expect certain fields in deeper layers of the struct, you don't want to have to deal with exceptions and do a manual preload, when you can expect them generally. In cases like this, you can enforce the depth of the preloading with the `:depth` keyword. This can be achieved in multiple ways.

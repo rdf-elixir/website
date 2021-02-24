@@ -226,10 +226,10 @@ iex> User.build!(EX.User2)
   age: nil,
   customer_type: nil,
   email: [],
-  friends: #Grax.Link.NotLoaded<link :friends is not loaded>,
+  friends: [],
   name: nil,
   password: nil,
-  posts: #Grax.Link.NotLoaded<link :posts is not loaded>
+  posts: []
 }
 ```
 
@@ -267,10 +267,10 @@ iex> Grax.put(user, :age, 42)
    age: 42,
    customer_type: nil,
    email: ["john@example.com"],
-   friends: #Grax.Link.NotLoaded<link :friends is not loaded>,
+   friends: [],
    name: "John",
    password: "secret",
-   posts: #Grax.Link.NotLoaded<link :posts is not loaded>
+   posts: []
  }}
 ```
 
@@ -297,10 +297,10 @@ iex> Grax.put!(user, :email, "john@doe.com")
   age: 42,
   customer_type: nil,
   email: ["john@doe.com"],
-  friends: #Grax.Link.NotLoaded<link :friends is not loaded>,
+  friends: [],
   name: "John",
   password: "secret",
-  posts: #Grax.Link.NotLoaded<link :posts is not loaded>
+  posts: []
 }
 ```
 
@@ -313,13 +313,13 @@ iex> Grax.put!(user, :posts, Post.build!(EX.Post2, title: "Foo"))
   age: 42,
   customer_type: nil,
   email: ["john@example.com"],
-  friends: #Grax.Link.NotLoaded<link :friends is not loaded>,
+  friends: [],
   name: "John",
   password: "secret",
   posts: [
     %Post{
       __id__: ~I<http://example.com/Post2>,
-      author: #Grax.Link.NotLoaded<link :author is not loaded>,
+      author: nil,
       content: nil,
       title: "Foo"
     }
@@ -339,10 +339,10 @@ iex> Grax.build!(user,
   age: 43,
   customer_type: nil,
   email: ["john@doe.com", "john@example.com"],
-  friends: #Grax.Link.NotLoaded<link :friends is not loaded>,
+  friends: [],
   name: "John",
   password: "secret",
-  posts: #Grax.Link.NotLoaded<link :posts is not loaded>
+  posts: []
 }
 ```
 
