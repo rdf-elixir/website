@@ -637,6 +637,45 @@ end
 For now, the only effect of a class declaration is that the mapping to RDF graphs will produce a `rdf:type` statement accordingly. In particular it doesn't mean that the RDF description of a resource must include a respective `rdf:type` to be loadable into a `Grax.Schema` struct.
 
 
+## Schema inheritance
+
+It is possible to derive a schema from an existing one, inheriting all of its defined properties.
+
+```elixir
+defmodule Customer do
+  use Grax.Schema
+
+  alias NS.EX
+
+  schema inherit: User do
+    property since: EX.customerSince, type: :date
+    
+    link subscription: EX.subscribed, type: Subscription
+  end
+end
+```
+
+If a class is also declared the following form is possible:
+
+```elixir
+defmodule Customer do
+  use Grax.Schema
+
+  alias NS.EX
+
+  schema EX.Customer < User do
+    property since: EX.customerSince, type: :date
+    
+    link subscription: EX.subscribed, type: Subscription
+  end
+end
+```
+
+Note, that the class must not necessarily be a subclass of the class of the inherited schema, although this might be the case often times.
+
+If some of the inherited properties should be redefined with other characteristics, this can be done without any restrictions. They can have a different type or map to a completely different RDF property, although this might be confusing.
+
+
 ## Custom fields
 
 If you already have or want to define certain fields on a `Grax.Schema` struct, which should be ignored by the RDF mapping, you can define them with the `field/1` macro.
@@ -738,7 +777,6 @@ defmodule User do
     link friends: FOAF.friend, type: list_of(User)
     link posts: -SchemaOrg.author, type: list_of(Post)
   end
-
 end
 
 defmodule CustomMappings do
