@@ -365,9 +365,10 @@ iex> User.build!(EX.User2,
        type: RDF.XSD.String,
        value: ["John", "JD"]
      },
-     email: %Grax.Schema.RequiredPropertyMissing{
-       message: "no value for required property :email present",
-       property: :email
+     email: %Grax.Schema.CardinalityError{
+       message: "[] does not match cardinality {:min, 1}",
+       cardinality: {:min, 1}, 
+       value: []
      },
      age: %Grax.Schema.TypeError{
        message: "value \"old\" does not match type RDF.XSD.Integer",

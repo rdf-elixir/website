@@ -252,27 +252,6 @@ If not specified otherwise, the default value will be `nil`, just like the defau
 Generally, if a `:type` is defined, the `:default` value must match this datatype. Otherwise it won't compile.
 
 
-### Required properties
-
-If you want to specify that a value for a data property must be present, you can do so with the `:required` option, which defaults to `false`.
-
-```elixir
-defmodule User do
-  use Grax.Schema
-
-  alias NS.{SchemaOrg, FOAF}
-
-  schema do
-    property name: SchemaOrg.name, type: :string, required: true
-    property emails: SchemaOrg.email, type: list_of(:string), required: true
-    property age: FOAF.age, type: :integer
-  end
-end
-```
-
-
-
-
 ## Link properties
 
 Now, back to our two kinds of properties, we'll see how link properties are mapped on to our Grax schemas. 
@@ -602,6 +581,61 @@ defmodule Post do
 end
 ```
 
+
+
+## Cardinalities
+
+You can define the cardinality the values of data properties and links of a schema must have in order to be considered valid. For non-list properties there are just two possible cardinalities: 1 or 0..1 or, in other words, required or not, which can be specified with the `:required` option defaulting to `false`.
+
+```elixir
+defmodule User do
+  use Grax.Schema
+
+  alias NS.{SchemaOrg, FOAF}
+
+  schema do
+    property name: SchemaOrg.name, type: :string, required: true
+    property emails: SchemaOrg.email, type: list_of(:string)
+    property age: FOAF.age, type: :integer
+  end
+end
+```
+
+For list properties you can specify the cardinality on the `list` resp. `list_of` type constructor functions with the `:card` option. It can have 
+
+- a single integer value for an exact cardinality, 
+- an Elixir range value (like `1..3`) for a cardinality with an lower and upper boundary,
+- or a `{:min, n}` tuple value with an integer for a minimal cardinality without an upper boundary
+
+```elixir
+defmodule User do
+  use Grax.Schema
+
+  alias NS.{SchemaOrg, FOAF}
+
+  schema do
+    property name: SchemaOrg.name, type: :string, required: true
+    property emails: SchemaOrg.email, type: list_of(:string, card: {:min, 1})
+    property age: FOAF.age, type: :integer
+  end
+end
+```
+
+The `{:min, 1}` cardinality can be specified also by using the `:required` option on a list type. So, this is equivalent to the former definition:
+
+```elixir
+defmodule User do
+  use Grax.Schema
+
+  alias NS.{SchemaOrg, FOAF}
+
+  schema do
+    property name: SchemaOrg.name, type: :string, required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
+    property age: FOAF.age, type: :integer
+  end
+end
+```
 
 
 ## Class declarations
