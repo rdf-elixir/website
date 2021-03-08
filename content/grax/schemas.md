@@ -582,6 +582,44 @@ end
 ```
 
 
+### Heterogeneous property links
+
+Links can also link different types of resources to different schemas. For this, the `:type` of a link property must be given as a map of class URIs to Grax schemas. 
+
+```elixir
+defmodule User do
+  use Grax.Schema
+
+  alias NS.{SchemaOrg, FOAF}
+
+  schema do
+    property name: SchemaOrg.name, type: :string, required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
+    property age: FOAF.age, type: :integer
+    
+    link friends: FOAF.friend, type: list_of(User)
+    link posts: -SchemaOrg.author, type: list_of(%{
+        SchemaOrg.BlogPosting => Post,
+        SchemaOrg.Comment => Comment
+      })
+  end
+end
+
+defmodule Comment do
+  use Grax.Schema
+
+  alias NS.SchemaOrg
+
+  schema do
+    property content: SchemaOrg.text(), type: :string
+
+    link author: SchemaOrg.author(), type: User
+  end
+end
+```
+
+So, depending on the `rdf:type` of the resource linked with a property the specified schema is used. When a linked resource doesn't have any of the specified types, the resource is ignored by default. You can change this behaviour and get an error in this case, by setting the `:on_type_mismatch` option to `:error`. Another way to deal with this situation is to provide a fallback in the type-schema mapping where  `nil` is used as the key instead of a class URI. The schema associated with `nil` will then be used when none of the other class URI matches an `rdf:type`. When multiple classes of a linked resource are matching, you'll always get an error.
+
 
 ## Cardinalities
 
