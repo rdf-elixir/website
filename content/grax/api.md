@@ -405,3 +405,9 @@ iex> Grax.to_rdf(user)
 ```
 
 
+::: tip
+
+The options given to `Grax.to_rdf/2` as the optional second argument are passed-through as options to the `RDF.Graph.new/2` call used for the creation of the graph. This allows you to set the name of the graph, define some prefixes, a base URI etc.
+
+:::
+
