@@ -36,7 +36,6 @@ A language-tagged literal can be created by providing the `language` option with
 import RDF.Sigils
 
 RDF.literal("foo", language: "en")
-RDF.literal("foo", "en")
 
 ~L"foo"en
 ```
