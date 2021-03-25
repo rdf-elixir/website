@@ -5,7 +5,7 @@ The [SPARQL.ex Hex package](https://hex.pm/packages/sparql) can be installed as 
 ```elixir
 def deps do
   [
-    {:sparql, "~> 0.2"}
+    {:sparql, "~> 0.3"}
   ]
 end
 ```
