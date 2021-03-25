@@ -102,7 +102,7 @@ iex> Grax.load(User, EX.User1, graph)
  }}
 ```
 
-Unlike most of the other functions working on existing `Grax.Schema` structs, you have to provide the `Grax.Schema` module explicitly. For this reason, the `Grax.Schema` modules provide a dedicated `load/2` function. On these the order of the resource identifier and the graph arguments is swapped for better pipeline support. So, the following function call is equivalent to the previous call:
+Unlike most of the other functions working on existing `Grax.Schema` structs, you have to provide the `Grax.Schema` module explicitly. For this reason, the `Grax.Schema` modules provide a dedicated `load/2` function on which the order of the resource identifier and the graph arguments is swapped for better pipeline support. So, the following function call is equivalent to the previous call:
 
 ```elixir
 graph |> User.load(EX.User1)
