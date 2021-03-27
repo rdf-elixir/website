@@ -51,6 +51,11 @@ For a more detailed description, including the various options, see the [API doc
 # Places with free wi-fi from Wikidata
 
 """
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
 SELECT ?item ?itemLabel (SAMPLE(?coord) AS ?coord)
 WHERE {
     ?item wdt:P2848 wd:Q1543615 ;  # wi-fi gratis

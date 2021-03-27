@@ -387,21 +387,21 @@ With the `Grax.to_rdf/1` function finally, you can map a `Grax.Schema` struct to
 ```elixir
 iex> Grax.to_rdf(user)
 {:ok,
- #RDF.Graph name: nil
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-
-<http://example.com/Post2>
-    <https://schema.org/author> <http://example.com/User2> ;
-    <https://schema.org/name> "Foo" .
-
-<http://example.com/User2>
-    a <https://schema.org/Person> ; 
-    <https://schema.org/email> "john@doe.com", "john@example.com" ;
-    <https://schema.org/name> "John" ;
-    <http://xmlns.com/foaf/0.1/age> 43 .
-}
+ #RDF.Graph<name: nil
+  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+  @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+  @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+  
+  <http://example.com/Post2>
+      <https://schema.org/author> <http://example.com/User2> ;
+      <https://schema.org/name> "Foo" .
+  
+  <http://example.com/User2>
+      a <https://schema.org/Person> ; 
+      <https://schema.org/email> "john@doe.com", "john@example.com" ;
+      <https://schema.org/name> "John" ;
+      <http://xmlns.com/foaf/0.1/age> 43 .
+>}
 ```
 
 

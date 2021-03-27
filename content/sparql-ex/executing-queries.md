@@ -65,17 +65,23 @@ iex> SPARQL.execute_query graph, """
 ...>    { ?x foaf:name ?name ;
 ...>         foaf:mbox ?mbox }
 ...>  """
-#RDF.Graph{name: nil
-     ~B<b0>
-         ~I<http://schema.org/email>
-             ~I<mailto:peter@example.org>
-         ~I<http://schema.org/name>
-             ~L"Peter Goodguy" 
-     ~B<b1>
-         ~I<http://schema.org/email>
-             ~I<mailto:jlow@example.com>
-         ~I<http://schema.org/name>
-             ~L"Johnny Lee Outlaw"}
+#RDF.Graph<name: nil
+  @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+  @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+  @prefix schema: <http://schema.org/> .
+  @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+  [
+      schema:email <mailto:peter@example.org> ;
+      schema:name "Peter Goodguy"
+  ] .
+
+  [
+      schema:email <mailto:jlow@example.com> ;
+      schema:name "Johnny Lee Outlaw"
+  ] .
+>
 ```
 
 The `SPARQL.execute_query/2` function converts a given query string implicitly to a `SPARQL.Query` struct. If you intend to execute the query multiple times it's better to do this step on your own with the `SPARQL.query/1` function and pass the interpreted query directly to `SPARQL.execute_query/2`, in order to not parse the query on every execution.

@@ -165,8 +165,9 @@ iex> EX.bar
 ~I<http://www.example.com/ns/bar>
 
 iex> EX.Foo |> EX.bar(EX.Baz)
-#RDF.Description
-<http://example.com/Foo>
-    <http://example.com/bar> <http://example.com/Baz> .
+#RDF.Description<
+  <http://example.com/Foo>
+      <http://example.com/bar> <http://example.com/Baz> .
+>
 ```
 
