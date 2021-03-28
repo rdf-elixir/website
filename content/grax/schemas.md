@@ -807,11 +807,13 @@ defmodule User do
     property name: SchemaOrg.name, type: :string, required: true
     property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
-    property password: nil
+
     property customer_type: RDF.type, 
              from_rdf: :customer_type_from_rdf,
              to_rdf: :customer_type_to_rdf
     
+    field :password
+
     link friends: FOAF.friend, type: list_of(User)
     link posts: -SchemaOrg.author, type: list_of(Post)
   end
@@ -841,11 +843,13 @@ defmodule User do
     property name: SchemaOrg.name, type: :string, required: true
     property emails: SchemaOrg.email, type: list_of(:string), required: true
     property age: FOAF.age, type: :integer
-    property password: nil
+    
     property customer_type: RDF.type, 
              from_rdf: {CustomMappings, :customer_type_from_rdf},
              to_rdf: {CustomMappings, :customer_type_to_rdf}
     
+    field :password
+
     link friends: FOAF.friend, type: list_of(User)
     link posts: -SchemaOrg.author, type: list_of(Post)
   end
