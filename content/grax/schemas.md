@@ -1,9 +1,9 @@
 # Schemas
 
-A **_Grax schema_** is just an Elixir struct.  In a traditional application, backed by a relational data model, you want to work with Elixir structs with the values from the relational database. You'll probably do this traditionally in Elixir with Ecto, by defining some `Ecto.Schema`s for the domain entities of your business. `Grax.Schema`s are similar to `Ecto.Schema`s, they both map the data to Elixir structs with some semantics on top of them, like a type system etc.
+A **_Grax schema_** is just an Elixir struct. In a traditional application, backed by a relational data model, you want to work with Elixir structs with the values from the relational database. You'll probably do this traditionally in Elixir with Ecto, by defining some `Ecto.Schema`s for the domain entities of your business. `Grax.Schema`s are similar to `Ecto.Schema`s, they both map the data to Elixir structs with some semantics on top of them, like a type system etc.
 
 But while Ecto maps data from relational databases, Grax maps data from graph databases to Elixir structs. Graph databases are based on the graph data model, which has less technical friction between the conceptual model of the humans and the data model for the machine as it is perfectly [demonstrated here](https://youtu.be/cHXbYLNa0qQ?t=290). By reducing the barrier between your conceptual models and the data models for your application, you have less to think about technical details and can spend more time on thinking about the actual domain model of the business problems your application has to solve.
-You've might have already got a feel of this, when working with GraphQL, you simply define the nested schemas of a tree.
+You might have already got a feel of this, when working with GraphQL, where you simply define the nested schemas of a tree.
 
 How does a `Grax.Schema` definition look like? As an example, let's assume we have an RDF graph like this, which we want to map to Elixir structs with Elixir values for an Elixir application:
 
@@ -50,7 +50,7 @@ alias NS.EX
 ```
 
 
-These structs from RDF.ex are the only RDF-related values you'll see in a Grax schema struct and will be replaced with a more generic solution in the next version. The additional `__id__` field should be treated similarly as the internal `__struct__` field of Elixir structs: use it maybe for pattern matching, but don't touch it directly (other than via functions exposed by the API). 
+These structs from RDF.ex are the only RDF-related values you'll see in a Grax schema struct. The `__id__` field should be treated similarly as the internal `__struct__` field of Elixir structs: use it maybe for pattern matching, but don't touch it directly (other than via functions exposed by the API). 
 
 ::: tip
 
@@ -65,7 +65,7 @@ But without any fields this isn't very interesting.
 
 As opposed to the term "field" used for the elements of Elixir structs and `Ecto.Schema`s, we are calling the elements of the `Grax.Schema` struct **_properties_**, because we're mapping them to RDF properties. Unlike for fields of an Ecto schema, we'll not just have to provide a name atom for our property fields, but also a URI for the RDF property.
 
-So, a property definition on a Grax schema is done in the body of a `schema/1` block with the `property/3` macro and the property field name and RDF property URI as the first two arguments.
+So, a property definition on a Grax schema is done in the body of a `schema/1` block with the `property/3` macro and the property field name and a RDF property URI as the first two arguments.
 
 ```elixir
 defmodule User do
@@ -96,7 +96,7 @@ end
 
 ::: warning
 
-We'll constantly use terms from RDF.ex vocabulary namespaces. This are modules and functions on these modules, which can be used instead of URIs in the Elixir code. If you're new to RDF.ex, you can read more about this [here](/rdf-ex/vocabularies).
+We'll constantly use terms from RDF.ex vocabulary namespaces. These are modules and functions on these modules, which can be used instead of URIs in the Elixir code. If you're new to RDF.ex, you can read more about this [here](/rdf-ex/vocabularies).
 :::
 
 You can also define properties in a more concise form with the `property/1` macro:
@@ -124,7 +124,7 @@ All of these definition forms lead to structs like this:
 }
 ```
 
-The property is accessible as a usual field name of the struct, but has an exact RDF interpretation implicitly through the internal mapping to an RDF property identifier. These minimal forms without any further property specifications are already valid property definitions in Grax. Unlike an Ecto schema, which requires a type specification, these structs are already fully functional. In a Grax schema the types are optional, just as RDF and most other graph models are at its core schema-free data models with optional types later on. 
+The property is accessible as a usual field name of the struct, but has an exact RDF interpretation implicitly through the internal mapping to an RDF property identifier. These minimal forms without any further type specifications are already valid property definitions in Grax. Unlike an Ecto schema, where every field requires a type, for a Grax schema the types are optional, just as RDF and most other graph models are at its core schema-free data models with optional types later on. 
 
 But before we bring types into the game, we'll have to differentiate two general kinds of properties: 
 
@@ -133,7 +133,7 @@ But before we bring types into the game, we'll have to differentiate two general
 
 Despite having very different kinds of values, there's one type dichotomy across both kinds of properties. We can have single values or sets of values.
 
-By default it is assumed that the value of every property is unique, unless specified otherwise. If multiple values are allowed, a list type can be specified with the `list_of` type constructor function which expects the type of its elements. The values will then be kept in a list accordingly. If you want to specify that a property can have multiple values of any datatype you can use the `list` function.
+By default it is assumed that the value of every property is unique, unless specified otherwise. If multiple values are allowed, a list type can be specified with the `list_of` type constructor function, which expects the type of its elements. The values will then be kept in a list accordingly. If you want to specify that a property can have multiple values of any datatype you can use the `list` function.
 
 With that we can extend our example mapping schema like this:
 
@@ -144,8 +144,8 @@ defmodule User do
   alias NS.{SchemaOrg, FOAF}
 
   schema do
-    property name: SchemaOrg.name, type: :string
-    property emails: SchemaOrg.email, type: list_of(:string)
+    property :name, SchemaOrg.name, type: :string
+    property :emails, SchemaOrg.email, type: list_of(:string)
   end
 end
 ```
@@ -171,7 +171,7 @@ Although ordered lists are used for multiple values, the order is irrelevant sin
 
 ### Datatypes
 
-The optional type specifications on our two kinds are fundamentally different. The types of data properties defined with the `property` macros can be specified by providing the name of a datatype with the `:type` keyword.
+The optional type specifications on our two kinds of properties are fundamentally different. The types of data properties defined with the `property` macros can be specified by providing the name of a datatype with the `:type` keyword.
 
 ```elixir
 defmodule User do
@@ -180,15 +180,15 @@ defmodule User do
   alias NS.{SchemaOrg, FOAF}
 
   schema do
-    property name: SchemaOrg.name, type: :string
-    property emails: SchemaOrg.email, type: list_of(:string)
-    property age: FOAF.age, type: :integer
+    property :name, SchemaOrg.name, type: :string
+    property :emails, SchemaOrg.email, type: list_of(:string)
+    property :age, FOAF.age, type: :integer
   end
 end
 ```
 
 The specified datatype defines what value a data property can have and which RDF datatype the produced literals for the RDF property should have. 
-The functions for working with these structs will validate the types of the values in the property fields in accordance with the datatype provided with the `:type` specification as described in the [Grax API section](/grax/api).
+The functions for working with these structs will validate these type definitions as described in the [Grax API section](/grax/api).
 
 The `User` structs now look like this:
 
@@ -254,14 +254,14 @@ Generally, if a `:type` is defined, the `:default` value must match this datatyp
 
 ## Link properties
 
-Now, back to our two kinds of properties, we'll see how link properties are mapped on to our Grax schemas. 
+Now, back to our two kinds of properties, we'll see how link properties are mapped to other Grax schemas. 
 
-Link properties, in the following sometimes called more shortly links, are on the edges of an RDF graph between the inner nodes with URIs or blank nodes, as opposed to data properties which are on the edges to leaf nodes with RDF literals. Other than for data properties, the actual a node identifier like an URI or a blank node of a link property, is not of interest, but it's the description of the thing the identifier refers to. So, the values of link properties are not the URIs or blank nodes in the object position of an RDF statement, but another Grax schema with the properties from the RDF description of the linked resource.
+Link properties, in the following sometimes called more shortly links, are the edges of an RDF graph between the inner nodes with URIs or blank nodes, as opposed to data properties which are the edges to leaf nodes with RDF literals. Other than for data properties, the actual value of a link property with a node identifier like an URI or a blank node is not of interest, but it's the description of the thing the identifier refers to. So, the values of link properties are not the URIs or blank nodes in the object position of an RDF statement, but another Grax schema with the properties from the RDF description of the linked resource.
 
 Just like relational associations are in Ecto mapped to the struct fields through another Ecto schema for the associated table, the linked resources of a root resource are embedded into the struct in the respective field, where the properties of the linked resource are kept, potentially linking to other resources. So, the links allow us to traverse the nodes of a graph, as a tree structure down from a root resource and its fields of nested `Grax.Schema` structs.
 
 A Grax link can be defined in a Grax `schema` definition with another macro specifically for link properties: the `link/3` macro. 
-It has almost the same interface as the `property/3` macro. The first two arguments are again for the name and IRI of the property. 
+It has almost the same interface as the `property/3` macro. The first two arguments are again for the name and IRI of the property.
 The `:type` option however has a different meaning and is no longer optional. It must be the module name of another `Grax.Schema` struct.
 
 ```elixir{11}
@@ -271,9 +271,9 @@ defmodule User do
   alias NS.SchemaOrg
 
   schema do
-    property name: SchemaOrg.name, type: :string, required: true
-    property emails: SchemaOrg.email, type: list_of(:string), required: true
-    property age: FOAF.age, type: :integer
+    property :name, SchemaOrg.name, type: :string, required: true
+    property :emails, SchemaOrg.email, type: list_of(:string), required: true
+    property :age, FOAF.age, type: :integer
 
     link :address, SchemaOrg.address, type: Address
   end
@@ -285,9 +285,9 @@ defmodule Address do
   alias NS.SchemaOrg
 
   schema do
-    property country: SchemaOrg.addressCountry, type: :string
-    property city: SchemaOrg.addressLocality, type: :string
-    property street: SchemaOrg.streetAddress, type: :string
+    property :country, SchemaOrg.addressCountry, type: :string
+    property :city, SchemaOrg.addressLocality, type: :string
+    property :street, SchemaOrg.streetAddress, type: :string
   end
 end
 ```
@@ -333,9 +333,9 @@ defmodule User do
   alias NS.{SchemaOrg, FOAF}
 
   schema do
-    property name: SchemaOrg.name, type: :string, required: true
-    property emails: SchemaOrg.email, type: list_of(:string), required: true
-    property age: FOAF.age, type: :integer
+    property :name, SchemaOrg.name, type: :string, required: true
+    property :emails, SchemaOrg.email, type: list_of(:string), required: true
+    property :age, FOAF.age, type: :integer
     
     link address: SchemaOrg.address, type: Address
     link friends: FOAF.friend, type: list_of(User)
