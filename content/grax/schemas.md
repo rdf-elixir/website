@@ -412,15 +412,15 @@ The default value for `:depth` is `1`. This means all of the data and object pro
     __id__: ~B"b1",
     city: "Berlin",
     street: nil,
-    country: #Grax.Link.NotLoaded<link :country is not loaded>
+    country: ~I<http://www.wikidata.org/entity/Q183>
   }
 }
 ```
 
-When loading a `Grax.Schema` struct the fields for the links which are not loaded are initialized with a `Grax.Link.NotLoaded` exception struct.
-If you've got a `Grax.Schema` struct with a value like this on the link field and want to access it, you'll have to do an explicit call of the `Grax.preload/3` function described in the next chapter about the API.
+When loading a `Grax.Schema` struct the fields for the links which are not loaded just have their node identifier as a value.
+If you've got a `Grax.Schema` struct with `RDF.IRI`s or `RDF.BlankNode`s like this on the link field and want to access the referenced recource, you'll have to do an explicit call of the `Grax.preload/3` function described in the next chapter about the API.
 
-But to ensure a proper processing of the Grax schema structs, which might expect certain fields in deeper layers of the struct, you don't want to have to deal with exceptions and do a manual preload, when you can expect them generally. In cases like this, you can enforce the depth of the preloading with the `:depth` keyword. This can be achieved in multiple ways.
+But to ensure a proper processing of the Grax schema structs, which might expect certain fields in deeper layers of the struct, you don't want to check for these values and have to do a manual preload. In cases like this, you can enforce the depth of the preloading with the `:depth` keyword. This can be achieved in multiple ways.
  
 The first approach might be to increase the depth on the `address` link to 2. 
 
@@ -543,8 +543,6 @@ end
 But additive preloading depths can lead to infinite preloading circles. This is prohibited by stopping with the preloading down a path, when the first already preloaded element on this path reoccurs.
 
 This a pretty greedy preloading strategy. But in the first version, which is limited to working on in-memory RDF.ex graphs, where loading is quite fast and the data access doesn't require any further IO, this simple strategy gets us already quite far.
-Although simple, it should be usable in some cases, especially with the capability to override preloading settings on individual API calls at any time.
-But again, this was just the easy, lowest hanging fruit of a strategy for a preloading algorithm. What we definitely want is for example query pattern-based or path-based preloading or that data properties can be defined that fetch values from the neighbourhood of a node directly into a schema, which will hopefully be available in future versions.
 
 
 ### Inverse property links
@@ -743,6 +741,8 @@ defmodule Customer do
 end
 ```
 
+Multiple inheritance is also supported by providing the schemas in a list.
+
 Note, that the class must not necessarily be a subclass of the class of the inherited schema, although this might be the case often times.
 
 If some of the inherited properties should be redefined with other characteristics, this can be done without any restrictions. They can have a different type or map to a completely different RDF property, although this might be confusing.
@@ -775,7 +775,7 @@ The default value of a custom field can be specified optionally with the `:defau
 
 Sometimes you want to perform more complex or simply non-default transformations when mapping RDF data to and from the Elixir structs of your application. In these cases you can define your own custom mapping functions on the `Grax.Schema` module and declare their usage on the `property` schema definition with the `:from_rdf` and `:to_rdf` options and the respective function names.
 
-The `from_rdf` function must accept three arguments:
+A `from_rdf` function must accept three arguments:
 
 1. The first argument is the list of the actual RDF values for the property for which the custom mapping was called.
 2. The second argument is the `RDF.Description` of the mapped resource, which can be used when the mapping depends on other properties of the resource description.
@@ -783,7 +783,7 @@ The `from_rdf` function must accept three arguments:
 
 When a mapping can be performed successfully the mapped value must be returned in an `:ok` tuple. Otherwise an `:error` tuple with the error must be returned.
 
-The `to_rdf` function must accept two arguments:
+A `to_rdf` function must accept two arguments:
 
 1. The first argument is the list of the actual values of the property from the struct for which the custom mapping was called.
 2. The second argument is the whole `Grax` struct, which can be used when the mapping depends on other properties of it.

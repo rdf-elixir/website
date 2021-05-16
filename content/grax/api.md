@@ -2,9 +2,9 @@
 
 As we've said, this is an early version, which can map RDF graphs only. 
 But even the mapping to RDF graphs is limited. 
-You can only map to and from RDF.ex graphs directly, not to graphs in triple stores via SPARQL. Also there are no querying capabilities. So, you'll have to provide the RDF.ex graphs and the identifier by yourself and you'll get back an RDF.ex graph. You can use the serializing capabilities of RDF.ex or the SPARQL client to read and write the RDF.ex graph.
+You can only map to and from RDF.ex graphs directly, not to graphs in triple stores via SPARQL. Also there are no querying capabilities. So, you'll have to provide the RDF.ex graphs by yourself and you'll get back an RDF.ex graph. You can use the serializing capabilities of RDF.ex or the SPARQL client to read and write the RDF.ex graph.
 
-The API for working with the `Grax.Schema` structs and the individuals of these structs is available on the top-level `Grax` module and can be applied polymorphically on `Grax.Schema` structs (with two exceptions). 
+The API for working with the `Grax.Schema` structs and the instances of these structs is available on the top-level `Grax` module and can be applied polymorphically on `Grax.Schema` structs (with two exceptions). 
 
 In the following we will use the example from the last chapter to show the API in action. Here it is again. The example data:
 
@@ -96,7 +96,7 @@ iex> Grax.load(User, EX.User1, graph)
    posts: [
      %Post{
        __id__: ~I<http://example.com/Post1>,
-       author: #Grax.Link.NotLoaded<link :author is not loaded>,
+       author: ~I<http://example.com/User1>,
        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident, nihil, dignissimos. Nesciunt aut totam eius. Magnam quaerat modi vel sed, ipsam atque rem, eos vero ducimus beatae harum explicabo labore!",
        title: "Lorem"
      }
@@ -114,7 +114,7 @@ There are also bang variants of the both the general `Grax.load/3` and the dedic
 
 ::: tip
 
-Loading values into the structs and performing the validation later is crucial when you want to confront the user with invalid data, eg. in a HTML form for manual cleaning of the data.
+Loading values into the structs and performing the validation later is useful when you want to confront the user with invalid data, eg. in a HTML form for manual cleaning of the data.
 
 :::
 
@@ -144,7 +144,7 @@ iex> User.load(graph, EX.User1, depth: 2)
          friends: [],
          name: "Jane",
          password: nil,
-         posts: #Grax.Link.NotLoaded<link :posts is not loaded>
+         posts: [~I<http://example.com/Post1>]
        },
        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident, nihil, dignissimos. Nesciunt aut totam eius. Magnam quaerat modi vel sed, ipsam atque rem, eos vero ducimus beatae harum explicabo labore!",
        title: "Lorem"
@@ -162,6 +162,16 @@ There still can be occasions when a manual preloading is needed:
 - when a circle occurred during preloading, aborting the preloading further down
 - or you simple discover later on, that you need further data
 
+Instead of checking for `RDF.IRI` or `RDF.BlankNode` values on link properties to determine if a manual preloading is needed, you can use the `Grax.preloaded?/2` function with a schema and a specific property or `Grax.preloaded?/1` or with just the schema. The later will return `true` only when all link properties are preloaded.
+
+```elixir
+iex> User.load!(graph, EX.User1, depth: 0) |> Grax.preloaded?(:posts)
+false
+
+iex> User.load!(graph, EX.User1, depth: 0) |> Grax.preloaded?()
+false
+```
+
 You can do a manual preload with the `Grax.preload/3` function.
 
 ```elixir
@@ -177,7 +187,7 @@ iex> user = User.load!(graph, EX.User1)
   posts: [
     %Post{
       __id__: ~I<http://example.com/Post1>,
-      author: #Grax.Link.NotLoaded<link :author is not loaded>,
+      author: ~I<http://example.com/User1>,
       content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident, nihil, dignissimos. Nesciunt aut totam eius. Magnam quaerat modi vel sed, ipsam atque rem, eos vero ducimus beatae harum explicabo labore!",
       title: "Lorem"
     }
@@ -250,7 +260,7 @@ iex> user = User.build!(EX.User2,
   friends: #Grax.Link.NotLoaded<link :friends is not loaded>,
   name: "John",
   password: "secret",
-  posts: #Grax.Link.NotLoaded<link :posts is not loaded>
+  posts: []
 }
 ```
 
@@ -329,6 +339,44 @@ iex> Grax.put!(user, :posts, Post.build!(EX.Post2, title: "Foo"))
 }
 ```
 
+You can also provide the properties and the values of a nested struct as a map. This however requires that you either provide the id of the nested resource in the `__id__` field or that a Grax id schema is defined for the schema of the linked resource, so that the id can be generated automatically, which will be further discussed in the next chapter.
+
+```elixir
+iex> Grax.put!(user, :posts, %{__id__: EX.Post2, title: "Foo"})
+%User{
+  __id__: ~I<http://example.com/User2>,
+  age: 42,
+  customer_type: nil,
+  email: ["john@example.com"],
+  friends: [],
+  name: "John",
+  password: "secret",
+  posts: [
+    %Post{
+      __id__: ~I<http://example.com/Post2>,
+      author: nil,
+      content: nil,
+      title: "Foo"
+    }
+  ]
+}
+```
+
+It is also possible to put just the node identifier of a linked resource as a `RDF.IRI` or `RDF.BlankNode`. 
+
+```elixir
+iex> Grax.put!(user, :posts, EX.Post2)
+%User{
+  __id__: ~I<http://example.com/User2>,
+  age: 42,
+  customer_type: nil,
+  email: ["john@example.com"],
+  friends: [],
+  name: "John",
+  password: "secret",
+  posts: [~I<http://example.com/Post2>]
+}
+```
 
 The `Grax.put/2` and `Grax.put!/2`  functions also allow to set multiple values at once with a map or keyword list.
 
