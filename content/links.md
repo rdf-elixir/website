@@ -32,6 +32,11 @@ sidebar: false
 - [Twitter](https://twitter.com/MarcelOttoDE)
 
 
+# Books
+
+- [Tony Hammond: "Exploring Graphs with Elixir - Connect Data with Native Graph Libraries and Graph Databases", The Pragmatic Programmers, 2021](https://pragprog.com/titles/thgraphs/exploring-graphs-with-elixir/)
+
+
 # Articles
 
 - [Tony Hammond](https://medium.com/@tonyhammond) has written a series of articles about the RDF.ex projects:
