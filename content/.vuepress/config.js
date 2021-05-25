@@ -136,7 +136,8 @@ function getGraxSidebar () {
         '',
         'installation',
         'schemas',
-        'api'
+        'api',
+        'ids'
       ]
     }
   ]
