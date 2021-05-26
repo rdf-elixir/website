@@ -5,7 +5,7 @@ The [Grax Hex package](https://hex.pm/packages/grax) can be installed as usual, 
 ```elixir
 def deps do
   [
-    {:grax, "~> 0.2"}
+    {:grax, "~> 0.3"}
   ]
 end
 ```
