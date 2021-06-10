@@ -14,7 +14,6 @@ graph =
        EX.Foo
        |> RDF.first(2)
        |> RDF.rest(RDF.nil))
-    )
 
 list = RDF.List.new(~B<Foo>, graph)
 ```
