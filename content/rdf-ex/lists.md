@@ -7,13 +7,15 @@ An existing `RDF.List` in a given graph can be created with `RDF.List.new` or it
 ```elixir
 graph = 
   Graph.new(
-       ~B<Foo>
-       |> RDF.first(1)
-       |> RDF.rest(EX.Foo))
-    |> Graph.add(
-       EX.Foo
-       |> RDF.first(2)
-       |> RDF.rest(RDF.nil))
+     ~B<Foo>
+     |> RDF.first(1)
+     |> RDF.rest(EX.Foo)
+   )
+   |> Graph.add(
+     EX.Foo
+     |> RDF.first(2)
+     |> RDF.rest(RDF.nil)
+   )
 
 list = RDF.List.new(~B<Foo>, graph)
 ```
