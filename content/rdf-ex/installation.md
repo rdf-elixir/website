@@ -22,23 +22,3 @@ def deps do
   ]
 end
 ```
-
-Since RDF.ex uses the [ProtocolEx](https://github.com/OvermindDL1/protocol_ex) library under the hood, you'll have to add its compiler in `mix.exs` (after the built-in elixir compiler):
-
-```elixir
-def project do
-  [
-    # ...
-    compilers: Mix.compilers ++ [:protocol_ex],
-    # ...
-  ]
-end
-```
-
-::: warning
-
-If you're a library developer building something on top of RDF.ex, you should add the same note in your installation instructions, since the compiler configuration is not inherited from dependencies.
-
-You can read about the details why RDF.ex needs this library [here](https://marcelotto.medium.com/the-walled-gardens-within-elixir-d0507a568015).
-
-:::
