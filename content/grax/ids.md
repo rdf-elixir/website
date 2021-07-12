@@ -99,7 +99,7 @@ defmodule Example.IdSpec do
 end
 ```
 
-As we've said, most of the time the Grax schema on which id schema should be applied is given directly. For this form the `id` macro provides a more succinct but semantically equivalent form. So, the following is an equivalent definition of the same id schema:
+As we've said, most of the time the Grax schema on which the id schema should be applied is given directly. For this form, the `id` macro provides a more succinct but semantically equivalent form. So, the following is an equivalent definition of the same id schema:
 
 ```elixir
 defmodule Example.IdSpec do
@@ -111,7 +111,7 @@ defmodule Example.IdSpec do
 end
 ```
 
-For cases, where template consists solely of a template parameter with a property from the schema, an event shorter form is supported by the `id` macro, where the property is written in the typical dot syntax after the schema. In our book example however, we don't have this simple template form, but we can get it simple into that form, by introducing a separate sub namespace, which might have been a good idea in the first place, since it allows us to define a prefix for this namespace. 
+For cases, where template consists solely of a template parameter with a property from the schema, an even shorter form is supported by the `id` macro, where the property is written in the typical dot syntax after the schema. In our book example however, we don't have this simple template form, but we can get it simple into that form, by introducing a separate sub namespace, which might have been a good idea in the first place, since it allows us to define a prefix for this namespace. 
 
 ```elixir
 defmodule Example.IdSpec do
@@ -145,7 +145,7 @@ iex> Book.build!(
 }       
 ```
 
-This also makes it particularly easy to build nested graph structures, where we can provide linked resources just as a map (as long as everything is included to produce the ids). Let's suppose we also have an `:author` link property in our `Book` schema which links to an `Author` schema with an id schema, which for the sake of simplicity is based on the schema (although this is not a good idea in terms of uniqueness). This allows us to build a our book like this:
+This also makes it particularly easy to build nested graph structures, where we can provide linked resources just as a map (as long as everything is included to produce the ids). Let's suppose we also have an `:author` link property in our `Book` schema which links to an `Author` schema with an id schema, which for the sake of simplicity is based on the name (although this is not a good idea in terms of uniqueness). This allows us to build a our book like this:
 
 ```elixir
 iex> Book.build!(
@@ -269,19 +269,99 @@ end
 
 The passed variables map will also include a special `:__schema__` value with Grax schema for which the id is requested. This can be very useful when the id schema is used for multiple Grax schemas. You can then pattern match on the `:__schema__` field and provide different variable processing logic for the different Grax schemas.
 
-::: warning
 
-You might be wondering why there's no example with a counter-based identifier, although they are so common. There's currently no direct support for counters. But it is planned to provide such support in the next version. For now, you'll have to implement them on your own and add them as a custom variable.
-:::
+## Auto-incremented counters
 
-However, instead of having to reach to this last resort, there are some extensions in Grax for some common types of identifiers.
+If you want to base the ids of a schema on an auto-incremented counter, you can do so by defining a counter on your id schema with the `counter` keyword argument, which will define a persistent counter with the given name. Every time a new instance of a schema is created with the `build` functions this counter will be automatically increased. You can include the value of the counter in your URI templates with the `counter` variable.
+
+```elixir
+defmodule Example.IdSpec do
+  use Grax.Id.Spec
+
+  namespace "http://example.com/" do
+      id Post, "posts/{counter}", counter: :posts
+    end
+  end
+end
+```
+
+```elixir
+iex> Post.build(title: "Foo")
+%Post{
+  __id__: ~I<http://example.com/posts/1>,
+  author: nil,
+  content: nil,
+  title: "Foo"
+}
+iex> Post.build(title: "Bar")
+%Post{
+  __id__: ~I<http://example.com/posts/2>,
+  author: nil,
+  content: nil,
+  title: "Bar"
+}
+```
+
+The abbreviated dot operator syntax when the template consists of a variable only is also supported for the counter variable:
+
+```elixir
+defmodule Example.IdSpec do
+  use Grax.Id.Spec
+
+  namespace "http://example.com/" do
+    namespace "posts/", prefix: :post do
+      id Post.counter, counter: :posts
+    end  
+  end
+end
+```
+
+You can also share the same counter between different schemas just by using the same name on the `counter` keyword argument, for example to define Wikidata-like id schemas with counters for different categories of classes.
+
+By default the counters are persisted in DETS tables, each in dedicated files with the name of the counter accordingly. The path where these are stored can be configured with the `counter_dir` option in your Mix config (default is the current directory):
+
+```elixir
+use Mix.Config
+
+config :grax, counter_dir: "example/counters/"
+```
+
+When you want to use a completely different way to manage and store your counters, you can define your own by implementing the `Grax.Id.Counter.Adapter` behaviour. The default adapter we've been using above is the `Grax.Id.Counter.Dets` implementation. An alternative implementation which simple stores a counter in a text file is available with `Grax.Id.Counter.TextFile`. This implementation however shouldn't be used in production. It just serves as a reference implementation and is only useful in tests or very simple scenarios.
+
+Another adapter can be set on an individual id schema with the `counter_adapter` keyword argument.
+
+```elixir
+defmodule Example.IdSpec do
+  use Grax.Id.Spec
+
+  namespace "http://example.com/" do
+    namespace "posts/", prefix: :post do
+      id Post.counter, counter: :posts, counter_adapter: Grax.Id.Counter.TextFile
+    end
+  end
+end
+```
+
+An adapter can also be set as the default counter adapter with the `counter_adapter` keyword either on a namespace or for a whole id spec on the `use Grax.Id.Spec` call.
+
+```elixir
+defmodule Example.IdSpec do
+  use Grax.Id.Spec, counter_adapter: Grax.Id.Counter.TextFile
+
+  namespace "http://example.com/", counter_adapter: Grax.Id.Counter.Dets do
+    namespace "posts/", prefix: :post do
+      id Post.counter, counter: :posts
+    end
+  end
+end
+```
 
 
 ## Hash ids
 
 If you want to base your identifiers on cryptographic hashes, you can use the `hash` macro from the `Grax.Id.Hash` extension. It works as a replacement for the `id` macro and provides an additional `hash` variable for use in the template given with the `:template` keyword argument. The property from which the hash is computed is given with the `:data` keyword argument and the hashing algorithm must be specified with the `:algorithm` argument. The names of the algorithms are passed down to Erlang hash function, so please refer to the [Erlang documentation](https://erlang.org/doc/man/crypto.html#type-hash_algorithm) of your version, for which ones are available.
 
-Let's use our `Post` schema from the last chapters as an example.
+Let's use our `Post` schema from the last chapters as an example again.
 
 ```elixir
 defmodule Example.IdSpec do
@@ -426,11 +506,11 @@ defmodule UrnIds do
   end
 
   urn :uuid do
-    uuid4 Post.content()
+    uuid4 Post.content
   end
 
   urn :sha1, algorithm: :sha do
-    hash Post.content()
+    hash Post.content
   end
 end
 ```
