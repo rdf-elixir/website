@@ -518,3 +518,27 @@ end
 Note, that in the case of the UUID URNs the URN format will be automatically selected. This format is only available in the URN namespaces.
 
 
+## Blank nodes
+
+Grax schemas which should have blank nodes as identifiers can be declared with the `blank_node` macro in an id spec. It just takes a single Grax schema or a list of Grax schemas as the only argument
+
+```elixir
+defmodule UrnIds do
+  use Grax.Id.Spec
+
+  blank_node Address
+end
+```
+
+The generated blank nodes ids will be underscored UUIDs.
+
+```elixir 
+iex> Address.build!(
+...>   street: "Marienstraße 11",
+...>   city: "Berlin")
+%Address{
+  __id__: ~B<_07456224d1074c87a1152f75319593ef>,
+  street: "Marienstraße 11",
+  city: "Berlin"
+}   
+```
