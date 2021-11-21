@@ -1,6 +1,6 @@
 # Serializations
 
-The RDF.ex package comes with implementations of the [N-Triples](https://www.w3.org/TR/n-triples/), [N-Quads](https://www.w3.org/TR/n-quads/) and [Turtle](https://www.w3.org/TR/turtle/) serialization formats. 
+The RDF.ex package comes with implementations of the [N-Triples](https://www.w3.org/TR/n-triples/), [N-Quads](https://www.w3.org/TR/n-quads/) and [Turtle](https://www.w3.org/TR/turtle/) serialization formats (incl. the respective RDF-star extensions). 
 Formats which require additional dependencies are implemented in separate Hex packages.
 The [JSON-LD](http://www.w3.org/TR/json-ld/) format for example is available with the [JSON-LD.ex](https://hex.pm/packages/json_ld) package and the [RDF-XML](http://www.w3.org/TR/rdf-syntax-grammar/) format is available with the [RDF-XML.ex](https://hex.pm/packages/rdf_xml) package.
 
@@ -41,7 +41,7 @@ xml_stream = RDF.XML.write_stream(graph)
 
 Note, that there's no `write_stream!/2` function. Since it's not possible to determine upfront, if anything will be ok with the stream, `write_stream/2` behaves like the other bang variants: It returns the stream directly and errors during consumption of the stream will raise an error.
 
-Many times you'll want read streams from the contents of file or write streams whose content is written to a file. In these cases you don't have to reach for the stream functions, but can use the file read and write functions instead. For formats with streaming support they use streaming by default, except for `write_file/3`. For the same reason as above only `write_file!/3` use streams by default. But you can use the `:stream` option to opt-in on `write_file/3` or opt-out on the other functions.
+Many times you'll want read streams from the contents of a file or write streams whose content is written to a file. In these cases you don't have to reach for the stream functions, but can use the file read and write functions instead. For formats with streaming support they use streaming by default, except for `write_file/3`. For the same reason as above, only `write_file!/3` uses streams by default. But you can use the `:stream` option to opt-in on `write_file/3` or opt-out on the other functions.
 
 
 ## File compression
@@ -53,7 +53,7 @@ RDF.NTriples.read_file!("/path/to/some_file.nt.gz")
 |> RDF.XML.write_file!("/path/to/some_file.rdf.gz")
 ```
 
-Note, that this can also be combined with file access via streams.
+This feature can also be combined with file access via streams.
 
 
 ## Base IRI

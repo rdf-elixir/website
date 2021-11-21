@@ -87,6 +87,7 @@ function getRDFSidebar () {
         'lists',
         'mapping-between-rdf-and-elixir',
         'serializations',
+        'rdf-star'
       ]    
     }
   ] 

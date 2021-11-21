@@ -1,9 +1,9 @@
 # Introduction
 
 RDF.ex is an implementation of the [RDF](https://www.w3.org/TR/rdf11-primer/) data model in Elixir. 
-It is fully compatible with the RDF 1.1 specification and provides in-memory data structures for RDF descriptions, RDF graphs and RDF datasets, which can be loaded and stored in various serializations formats.
+It is fully compatible with the [RDF 1.1 specification](http://www.w3.org/TR/rdf11-concepts/) and the [RDF-star specification](https://w3c.github.io/rdf-star/cg-spec) and provides in-memory data structures for RDF descriptions, RDF graphs and RDF datasets, which can be loaded and stored in various serializations formats.
 
-The [RDF standard](http://www.w3.org/TR/rdf11-concepts/) defines a graph data model for distributed information on the web. An RDF graph is a set of statements aka RDF triples consisting of three nodes:
+The RDF standard defines a graph data model for distributed information on the web. An RDF graph is a set of statements aka RDF triples consisting of three nodes:
 
 1. a subject node with an IRI or a blank node,
 2. a predicate node with the IRI of a RDF property, 
