@@ -255,6 +255,20 @@ The `RDF.Description.statements/1` and `RDF.Dataset.statements/1` functions also
 
 
 
+## Querying
+
+[SPARQL.ex](/sparql-ex/) does not have SPARQL-star support yet.
+However, the BGP query engine built into RDF.ex (accessible via `RDF.Graph.query/2`; see [here](/rdf-ex/data-structures.html#querying-graphs) for more), fully supports RDF-star triples and RDF-star triple patterns.
+
+```elixir
+iex> graph = RDF.graph({{EX.Employee38, EX.jobTitle(), "Assistent Designer"}, 
+...>  EX.accordingTo(), EX.Employee22})
+iex> RDF.Graph.query(graph, {{:s?, :_p, :_o}, EX.accordingTo(), EX.Employee22})
+[%{s: ~I<http://example.com/Employee38>}]
+```
+
+
+
 ## Serializations
 
 The serialization formats within RDF.ex all support the respective RDF-star extensions: N-Triples-star, N-Quads-star and Turtle-star. They are part of the implementation of the respective base formats. So, you can use the respective functions as described in the chapter on [Serializations](/rdf-ex/serializations).
