@@ -2,6 +2,13 @@
 
 RDF.ex also supports the [RDF-star specification](https://w3c.github.io/rdf-star/cg-spec), an extension of RDF which adds the ability to make statements about other statements. This is achieved by extending the RDF data model to allow triples itself as subjects or objects of triples. 
 
+::: warning
+
+The specification process of RDF-star is still ongoing. 
+So it might still be subject to breaking changes.
+
+:::
+
 Before we look at the implementation in RDF.ex some definition of terms we need.
 A triple on the subject or object position of another triple is called a _quoted triple_.
 A quoted triple must not necessarily also be asserted, i.e. be an element of an RDF graph other than as a quoted triple of one of its triples. But if the quoted triple is also part of the graph in an unquoted form, it is called an _asserted triple_.
