@@ -1359,7 +1359,7 @@
     markdown-it-table-of-contents "^0.4.0"
     prismjs "^1.13.0"
 
-"@vuepress/plugin-active-header-links@1.9.3":
+"@vuepress/plugin-active-header-links@1.9.3", "@vuepress/plugin-active-header-links@^1.9.3":
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/@vuepress/plugin-active-header-links/-/plugin-active-header-links-1.9.3.tgz#8596faf4e50c2ac89d2838be5528bf7bcd6e626b"
   integrity sha512-cmNUP6ZyofThmUw6w2ogTSmfDuYGFTGOQ1sAfw+IS7X9gauF3JU4cwdNrDuzhOitMdc4gLqQiYvM1EONHznqEQ==
