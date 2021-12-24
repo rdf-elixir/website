@@ -30,6 +30,7 @@ module.exports = ctx => ({
       headerAnchorSelector: '.header-anchor'
     }],
     ['@vuepress/back-to-top', true],
+    ['@vuepress/last-updated', true],
     ['@vuepress/pwa', {
       serviceWorker: true,
       updatePopup: true
