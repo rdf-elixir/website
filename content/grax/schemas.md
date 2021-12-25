@@ -346,7 +346,7 @@ end
 But as you might see already with this link property, there's one problem we'll have to solve.
 
 
-### Preloading 
+### Preloading
 
 Preloading is the operation of populating a `Grax.Schema` struct by loading (mapping) the RDF descriptions of linked resources from an RDF graph into a tree structure over the linked property fields of a `Grax.Schema` recursively.
 
@@ -771,9 +771,16 @@ end
 The default value of a custom field can be specified optionally with the `:default` keyword.
 
 
+
 ## Custom mappings
 
-Sometimes you want to perform more complex or simply non-default transformations when mapping RDF data to and from the Elixir structs of your application. In these cases you can define your own custom mapping functions on the `Grax.Schema` module and declare their usage on the `property` schema definition with the `:from_rdf` and `:to_rdf` options and the respective function names.
+Sometimes you want to perform more complex or simply non-default transformations when mapping RDF data to and from the Elixir structs of your application. 
+Grax offers two ways to provide custom mapping logic for such cases.
+
+
+### Property mapping functions
+
+One approach is to define your own custom mapping functions for individual properties and register them on the `property` schema definition with the `:from_rdf` and `:to_rdf` options.
 
 A `from_rdf` function must accept three arguments:
 
@@ -795,7 +802,6 @@ The return value can be either:
 - an `:error` tuple with an error
 
 For both custom mapping functions you can return `nil` as a value when no values should be produced by the mapping.
-
 
 ```elixir
 defmodule User do
@@ -864,3 +870,63 @@ defmodule CustomMappings do
   def customer_type_to_rdf(_, _), do: {:ok, nil}
 end
 ```
+
+
+### Callbacks
+
+Another way to define custom mappings is possible with the `on_load/3` and `on_to_rdf/3` callbacks, which can be implemented on your `Grax.Schema` modules.
+
+The `on_load/3` callback is called whenever RDF data is loaded into a respective `Grax.Schema` struct, either directly via the `load/2` function or indirectly through preloading (see the [section on loading graphs](api.html#loading-from-rdf-graphs) for more on this) and allows to change or enrich the mapping.
+The function receives three arguments:
+
+1. The `Grax.Schema` struct filled with the default mapping.
+2. The `RDF.Graph` or `RDF.Description` which was passed to `load/2` as the data source.
+3. The keyword options passed to `load/2`.
+
+The result returned by the `on_load/3` callback implementation will become the result of the initial `load/2` call and should either an `:ok` tuple with `Grax.Schema` struct or an `:error` tuple.
+
+The `on_to_rdf/3` callback is called when the gets mapped to RDF with the `Grax.to_rdf/2` function and receives three arguments also.
+
+1. The `Grax.Schema` struct to be mapped.
+2. The `RDF.Graph` with the already mapped data.
+3. The keyword options passed to `Grax.to_rdf/2`.
+
+The result must be the updated or enriched `RDF.Graph` in an `:ok` tuple or an error tuple.
+
+```elixir
+defmodule User do
+  use Grax.Schema
+
+  alias NS.{SchemaOrg, FOAF, EX}
+
+  schema SchemaOrg.Person do
+    property name: SchemaOrg.name, type: :string, required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
+    property age: FOAF.age, type: :integer
+
+    field :customer_type
+    field :password
+
+    link friends: FOAF.friend, type: list_of(User)
+    link posts: -SchemaOrg.author, type: list_of(Post)
+  end
+
+  def on_load(user, graph, _opts) do
+    if RDF.iri(EX.PremiumUser) in 
+        List.wrap(get_in(graph, [user.__id__, RDF.type()])) do
+      {:ok, %User{user | customer_type: :premium_user}}
+    else
+      {:ok, user}
+    end
+  end
+
+  def on_to_rdf(%User{customer_type: :premium_user} = user, graph, _opts) do
+    {:ok, RDF.Graph.add(graph, [user.__id__, RDF.type(), EX.PremiumUser])}
+  end
+
+  def on_to_rdf(user, graph, _opts), do: {:ok, graph}
+end
+```
+
+
+
