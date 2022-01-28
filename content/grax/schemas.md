@@ -40,17 +40,20 @@ defmodule User do
 end
 ```
 
-This will define a struct on the `User` module. Although this struct doesn't have any user-defined fields for the domain model of our application yet, this could already represent an RDF graph node, since every `Grax.Schema` struct has at least an internal `__id__`  field, which contains the `RDF.IRI` or `RDF.BlankNode`, mapping to a graph node. So, an instance of this struct would look like this:
+This will define a struct on the `User` module. Although this struct doesn't have any user-defined fields for the domain model of our application yet, this could already represent an RDF graph node, since every `Grax.Schema` struct has at least an internal `__id__`  field, which contains the `RDF.IRI` or `RDF.BlankNode`, mapping to a graph node. It also contains an `__additional_statements__` field, which keeps the statements about the subject with properties not part of the Grax schema as a map with the predicate-objects pairs. 
+
+So, an instance of this struct would look like this:
 
 ```elixir
 alias NS.EX
 
-%User{__id__: RDF.iri(EX.User1)}
-%Address{__id__: ~B<Address1>}
+%User{__id__: RDF.iri(EX.User1), __additional_statements__: %{}}
+%Address{__id__: ~B<Address1>, __additional_statements__: %{}}
 ```
 
+The structs in the `__id__` field from RDF.ex are the only RDF-related values you'll see in a Grax schema struct. The `__id__` field should be treated similarly as the internal `__struct__` field of Elixir structs: use it maybe for pattern matching, but don't touch it directly (other than via functions exposed by the API). 
 
-These structs from RDF.ex are the only RDF-related values you'll see in a Grax schema struct. The `__id__` field should be treated similarly as the internal `__struct__` field of Elixir structs: use it maybe for pattern matching, but don't touch it directly (other than via functions exposed by the API). 
+More on the treatment of additional statements in the [API chapter](api). For the rest of this chapter, we won't show the `__additional_statements__` field anymore.
 
 ::: tip
 

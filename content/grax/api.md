@@ -87,6 +87,7 @@ iex> Grax.load(User, EX.User1, graph)
 {:ok,
  %User{
    __id__: ~I<http://example.com/User1>,
+   __additional_statements__: %{},
    age: nil,
    customer_type: :premium_user,
    email: ["jane@example.com", "jane@work.com"],
@@ -117,6 +118,8 @@ There are also bang variants of the both the general `Grax.load/3` and the dedic
 Loading values into the structs and performing the validation later is useful when you want to confront the user with invalid data, eg. in a HTML form for manual cleaning of the data.
 
 :::
+
+When the source data contains statements about the subject with a property that is not part of the Grax schema, it will be stored in the map of the `__additional_statements__` field of the `Grax.Schema` struct, so the description of the subject won't lose any information when serializing an updated version back. See more on accessing the additional statements [below](#additional-statements)
 
 The links of a schema will be preloaded as configured in the schema specification. As described in the last chapter, currently only the depth-preloading strategy is implemented. And unless you've configured other preloading depths on the links or the schema, the default preloading depth of one is used, which means you'll get all data and link properties of the loaded resource, but from the linked resources just the data properties. The links of the linked resource won't be loaded.
 
@@ -430,6 +433,7 @@ iex> User.build!(EX.User2,
 ```
 
 
+
 ## Mapping to RDF graphs
 
 With the `Grax.to_rdf/1` function finally, you can map a `Grax.Schema` struct to a `RDF.Graph`.
@@ -461,3 +465,72 @@ The options given to `Grax.to_rdf/2` as the optional second argument are passed-
 
 :::
 
+
+
+## Additional statements
+
+When we're loading data which contains statements about the subject with a property that is not part of the Grax schema, it will be stored in the map of the `__additional_statements__` field of the `Grax.Schema` struct.
+The `Grax.to_rdf/1` function will add these statements to the result.
+This way no statements won't be lost when processing RDF descriptions with Grax.
+
+Let's say the example RDF description of our user would contain an additional statement:
+
+```ttl{11}
+  @prefix : <http://example.com/> .
+  @prefix schema: <https://schema.org/> .
+  @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+  @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+  :User1 
+      a schema:Person, :PremiumUser ;
+      schema:name "Jane" ;
+      schema:email "jane@example.com", "jane@work.com" ;
+      foaf:age 30 ; 
+      rdfs:comment "a comment about our example user resource" .
+```
+
+Since we don't have specified a field for this property, the statement would be stored in the `__additional_statements__` map.
+
+```elixir{5-8}
+iex> user = User.load!(graph, EX.User1)
+%User{
+  __id__: ~I<http://example.com/User1>,
+  __additional_statements__: %{
+    ~I<http://www.w3.org/2000/01/rdf-schema#comment> => 
+       #MapSet<[~L"a comment about our example user resource"]>
+  },
+  age: nil,
+  customer_type: :premium_user,
+  email: ["jane@example.com", "jane@work.com"],
+  friends: [],
+  name: "Jane",
+  password: nil,
+  posts: [
+    %Post{
+      __id__: ~I<http://example.com/Post1>,
+      author: ~I<http://example.com/User1>,
+      content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident, nihil, dignissimos. Nesciunt aut totam eius. Magnam quaerat modi vel sed, ipsam atque rem, eos vero ducimus beatae harum explicabo labore!",
+     title: "Lorem"
+    }
+  ]
+}
+```
+
+Since all of the properties of importance for your application usually are defined on a `Grax.Schema`, you usually don't care for the contents of this map. 
+However, if you want to access the additional statements, you can do so with the `Grax.additional_statements/1`,  `Grax.add_additional_statements/2`,  `Grax.put_additional_statements/2` and `Grax.clear_additional_statements/1` functions.
+
+```elixir
+iex> Grax.add_additional_statements(user, %{RDFS.comment() => "another comment"})
+..> |> Grax.additional_statements()
+#RDF.Description<
+  <http://example.com/User1>
+      rdfs:comment "a comment about our example user resource", "another comment" .
+>
+
+iex> Grax.put_additional_statements(user, %{RDFS.comment() => "yet another comment"})
+...> |> Grax.additional_statements()
+#RDF.Description<
+  <http://example.com/User1>
+      rdfs:comment "yet another comment" .
+>
+```
