@@ -91,6 +91,7 @@ function getRDFSidebar () {
         'data-structures',
         'lists',
         'mapping-between-rdf-and-elixir',
+        'resource-generators',
         'serializations',
         'rdf-star'
       ]    
