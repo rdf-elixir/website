@@ -43,6 +43,25 @@ WHERE
 For a more detailed description, including the various options, see the [API documentation](http://hexdocs.pm/sparql_client/SPARQL.Client.html).
 
 
+## SPARQL-star support
+
+The SPARQL-star extensions of the JSON and XML result format are also supported via the standard media-types. Some vendors however, have introduced separate media-types for results with the SPARQL-star extension. You'll have to provide the media-type expected by your vendor via the `:accept_header` option and enforce the respective default result format via the `:result_format` option.
+
+For example, here's how you can receive SPARQL-star results from Ontotext's GraphDB:
+
+```elixir
+SPARQL.Client.query(sparql_star_select_query, endpoint,
+  accept_header: "application/x-sparqlstar-results+json",
+  result_format: :json
+)
+
+SPARQL.Client.query(sparql_star_construct_query, endpoint,
+  accept_header: "application/x-turtlestar",
+  result_format: :turtle
+)
+```
+
+
 ## Examples
 
 ### `SELECT` query
