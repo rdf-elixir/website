@@ -1,6 +1,6 @@
 # Resource generators
 
-When you need a configurable and customizable way to generate resource identifier in your application, you can provide that with the help of `RDF.Resource.Generator`s, a behaviour for configurable identifier generation strategies.
+When you need a configurable and customizable way to generate resource identifiers in your application, you can provide that with the help of `RDF.Resource.Generator`s, a behaviour for configurable identifier generation strategies.
 They support the generation of two kinds of identifiers:
 
 1. parameter-less identifiers which will be random by nature
@@ -12,11 +12,11 @@ We just have to define a function like this:
 
 ```elixir
 defmodule Foo do
-  def id() do 
+  def id do 
     RDF.Resource.Generator.generate(id_config())
   end
 
-  defp id_config() do
+  defp id_config do
     Application.get_env(:foo, :id, generator: RDF.BlankNode)
   end
 end
@@ -54,7 +54,7 @@ If you want to use a value-based generator instead or additionally, you can defi
 
 ```elixir
 defmodule Foo do
-  def id() do 
+  def id do 
     RDF.Resource.Generator.generate(id_config())
   end
 
@@ -62,7 +62,7 @@ defmodule Foo do
     RDF.Resource.Generator.generate(id_config(), value)
   end
 
-  defp id_config() do
+  defp id_config do
     Application.get_env(:foo, :id, generator: RDF.BlankNode)
   end
 end
