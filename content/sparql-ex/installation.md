@@ -15,7 +15,7 @@ The [SPARQL.Client Hex package](https://hex.pm/packages/sparql_client) can be in
 ```elixir
 def deps do
   [
-    {:sparql_client, "~> 0.3"}
+    {:sparql_client, "~> 0.4"}
   ]
 end
 ```
