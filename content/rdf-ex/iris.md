@@ -16,10 +16,14 @@ RDF.iri!("http://www.example.com/foo")
 
 Besides being a little shorter than `RDF.IRI.new` and better `import`able, their usage will automatically benefit from any future IRI creation optimizations and is therefore recommended over the original functions.
 
-A literal IRI can also be written with the `~I` sigil:
+A literal IRI can also be written with the `~I` sigil or the `~i` which supports string interpolation:
 
 ```elixir
+import RDF.Sigils
+
 ~I<http://www.example.com/foo>
+
+~i<http://www.example.com/#{fun(args)}>
 ```
 
 But there's an even shorter notation for IRI literals.

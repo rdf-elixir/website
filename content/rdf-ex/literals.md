@@ -19,18 +19,20 @@ iex> RDF.literal("foo") |> RDF.Literal.value()
 "foo"
 ```
 
-An untyped literal can also be created with the `~L` sigil:
+An untyped literal can also be created with the `~L` sigil or the `~l` which supports string interpolation:
 
 ```elixir
 import RDF.Sigils
 
 ~L"foo"
+
+~L"foo #{fun(args)"
 ```
 
 
 ## Language-tagged literals
 
-A language-tagged literal can be created by providing the `language` option with a [BCP47](https://tools.ietf.org/html/bcp47)-conform language or by adding the language as a modifier to the `~L` sigil:
+A language-tagged literal can be created by providing the `language` option with a [BCP47](https://tools.ietf.org/html/bcp47)-conform language or by adding the language as a modifier to the `~L` or `~l` sigil:
 
 ```elixir
 import RDF.Sigils
