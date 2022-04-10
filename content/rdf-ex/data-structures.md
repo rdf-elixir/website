@@ -55,7 +55,7 @@ On the `new` constructors of `RDF.Graph` and `RDF.Dataset` the data can also be 
 |> RDF.Dataset.new()
 ```
 
-This feature cannot be supported on `RDF.Description/new/2` since the subject is mandatory. But this shouldn't be such a big limitation, since often times `RDF.Description`s are created with the Description DSL introduced [here](/rdf-ex/vocabularies.html#description-dsl).
+This feature cannot be supported on `RDF.Description/new/2` since the subject is mandatory. But this shouldn't be such a big limitation, since often times `RDF.Description`s are created with the Description DSL introduced [here](/rdf-ex/description-and-graph-dsl.html#description-dsl).
 
 ::: danger
 This form of passing the input data directly has one caveat: the input form of grouping multiple predicate-object pairs for a subject given as a vocabulary namespace term is not supported as it is indistinguishable from Keyword opts, eg. in this example the input won't be recognized correctly:

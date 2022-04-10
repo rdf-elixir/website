@@ -47,31 +47,6 @@ This way of expressing IRIs has the additional benefit, that the existence of th
 For terms not adhering to the capitalization rules (lowercase properties, capitalized non-properties) or containing characters not allowed within atoms, the predefined namespaces in `RDF.NS` define aliases accordingly. If unsure, have a look at the documentation or their definitions. 
 
 
-## Description DSL
-
-The functions for the properties on a vocabulary namespace module, are also available in a description builder variant, which accepts subject and objects as arguments.
-
-```elixir
-RDF.type(EX.Foo, EX.Bar)
-```
-
-If you want to state multiple statements with the same subject and predicate, you can either pass the objects as a list or as additional arguments, if there are not more than five of them:
-
-```elixir
-RDF.type(EX.Foo, EX.Bar, EX.Baz)
-EX.foo(EX.Bar, [1, 2, 3, 4, 5, 6])
-```
-
-In combination with Elixirs pipe operators this leads to a description DSL resembling [Turtle](https://www.w3.org/TR/turtle/):
-
-```elixir
-EX.Foo
-|> RDF.type(EX.Bar)
-|> EX.baz(1, 2, 3)
-```
-
-The produced statements are returned by this function as a `RDF.Description` structure which will be described below.
-
 
 ## Defining vocabulary namespaces
 

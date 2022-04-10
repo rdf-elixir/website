@@ -90,6 +90,7 @@ function getRDFSidebar () {
         'statements',
         'data-structures',
         'lists',
+        'description-and-graph-dsl',
         'mapping-between-rdf-and-elixir',
         'resource-generators',
         'serializations',
