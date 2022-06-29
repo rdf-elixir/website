@@ -517,7 +517,7 @@ iex> user = User.load!(graph, EX.User1)
 ```
 
 Since all of the properties of importance for your application usually are defined on a `Grax.Schema`, you usually don't care for the contents of this map. 
-However, if you want to access the additional statements, you can do so with the `Grax.additional_statements/1`,  `Grax.add_additional_statements/2`,  `Grax.put_additional_statements/2` and `Grax.clear_additional_statements/1` functions.
+However, if you want to access the additional statements, you can do so with the `Grax.additional_statements/1`,  `Grax.add_additional_statements/2`,  `Grax.put_additional_statements/2`,  `Grax.delete_additional_statements/2` and `Grax.clear_additional_statements/1` functions.
 
 ```elixir
 iex> Grax.add_additional_statements(user, %{RDFS.comment() => "another comment"})
@@ -526,11 +526,14 @@ iex> Grax.add_additional_statements(user, %{RDFS.comment() => "another comment"}
   <http://example.com/User1>
       rdfs:comment "a comment about our example user resource", "another comment" .
 >
-
-iex> Grax.put_additional_statements(user, %{RDFS.comment() => "yet another comment"})
-...> |> Grax.additional_statements()
-#RDF.Description<
-  <http://example.com/User1>
-      rdfs:comment "yet another comment" .
->
 ```
+
+::: tip
+
+The `Grax.delete_additional_statements/2` functions deletes only the explicitly given predicate-object pairs. If you want to delete all statements with a given predicate, you can use `Grax.put_additional_statements/2` and providing `nil` as the object value.
+
+```elixir
+`Grax.put_additional_statements(user, %{RDFS.comment() => nil})
+```
+
+:::
