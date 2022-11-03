@@ -6,25 +6,27 @@ The `RDF.Triple` and `RDF.Quad` modules both provide a function `new` for such t
 
 ```elixir
 iex> RDF.triple(EX.S, EX.p, 1)
-{~I<http://example.com/S>, ~I<http://example.com/p>, RDF.integer(1)}
+{~I<http://example.com/S>, ~I<http://example.com/p>, RDF.XSD.Integer.new(1)}
 
 iex> RDF.triple {EX.S, EX.p, 1}
-{~I<http://example.com/S>, ~I<http://example.com/p>, RDF.integer(1)}
+{~I<http://example.com/S>, ~I<http://example.com/p>, RDF.XSD.Integer.new(1)}
 
 iex> RDF.quad(EX.S, EX.p, 1, EX.Graph)
-{~I<http://example.com/S>, ~I<http://example.com/p>, RDF.integer(1),
+{~I<http://example.com/S>, ~I<http://example.com/p>, RDF.XSD.Integer.new(1),
  ~I<http://example.com/Graph>}
 
 iex> RDF.triple {EX.S, 1, EX.O}
 ** (RDF.Triple.InvalidPredicateError) '1' is not a valid predicate of a RDF.Triple
-    (rdf) lib/rdf/statement.ex:53: RDF.Statement.coerce_predicate/1
-    (rdf) lib/rdf/triple.ex:26: RDF.Triple.new/3
+    (rdf 1.0.0) lib/rdf/model/statement.ex:90: RDF.Statement.coerce_predicate/1
+    (rdf 1.0.0) lib/rdf/star/triple.ex:54: RDF.Star.Triple.new/4
 ```
 
 If you want to explicitly create a quad in the default graph context, you can use `nil` as the graph name. The `nil` value is used consistently as the name of the default graph within RDF.ex.
 
 ```elixir
 iex> RDF.quad(EX.S, EX.p, 1, nil)
-{~I<http://example.com/S>, ~I<http://example.com/p>, RDF.integer(1), nil}
+{~I<http://example.com/S>, ~I<http://example.com/p>, RDF.XSD.Integer.new(1),
+ nil}
 ```
 
+Various guards are available to perform pattern matches for proper statements. Please refer to the [API docs](https://hexdocs.pm/rdf/RDF.Guards.html) for more on these.

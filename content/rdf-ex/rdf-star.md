@@ -20,15 +20,15 @@ An RDF-star statement in RDF.ex is an ordinary RDF.ex statement tuple where the 
 iex> RDF.triple({{EX.Employee38, EX.jobTitle(), "Assistent Designer"}, 
 ...>  EX.accordingTo(), EX.Employee22})
 {{~I<http://example.com/Employee38>, ~I<http://example.com/jobTitle>,
-  %RDF.Literal{literal: %RDF.XSD.String{value: "Assistent Designer", lexical: "Assistent Designer"}, valid: true}},
- ~I<http://example.com/accordingTo>, ~I<http://example.com/Employee22>}
+  ~L"Assistent Designer"}, ~I<http://example.com/accordingTo>,
+ ~I<http://example.com/Employee22>}
 ```
 
 Just like that, wherever a subject or object term is expected, a triple can be given.
 
 ```elixir
 iex> {EX.Employee38, EX.jobTitle(), "Assistent Designer"} |> EX.accordingTo(EX.Employee22)
-#RDF.Description<
+#RDF.Description<subject: {~I<http://example.com/Employee38>, ~I<http://example.com/jobTitle>, ~L"Assistent Designer"}
   << <http://example.com/Employee38> <http://example.com/jobTitle> "Assistent Designer" >>
       <http://example.com/accordingTo> <http://example.com/Employee22> .
 >
@@ -36,7 +36,7 @@ iex> {EX.Employee38, EX.jobTitle(), "Assistent Designer"} |> EX.accordingTo(EX.E
 iex> RDF.graph() 
 ...> |> RDF.Graph.add({{EX.Employee38, EX.jobTitle(), "Assistent Designer"}, EX.accordingTo(), EX.Employee22})
 ...> |> RDF.Graph.get({EX.Employee38, EX.jobTitle(), "Assistent Designer"})
-#RDF.Description<
+#RDF.Description<subject: {~I<http://example.com/Employee38>, ~I<http://example.com/jobTitle>, ~L"Assistent Designer"}
   << <http://example.com/Employee38> <http://example.com/jobTitle> "Assistent Designer" >>
       <http://example.com/accordingTo> <http://example.com/Employee22> .
 >
@@ -62,7 +62,7 @@ iex> graph =
 ...>   RDF.graph(prefixes: [ex: EX]) 
 ...>   |> RDF.Graph.add_annotations([
 ...>     {EX.S1, EX.p1(), EX.O1}, 
-...>      EX.S2 |> EX.p2("Foo", "Bar")
+...>      EX.S2 |> EX.p2(["Foo", "Bar"])
 ...>   ], %{EX.ap1() => EX.AO1, EX.ap2() => EX.AO2})
 #RDF.Graph<name: nil
   @prefix ex: <http://example.com/> .
@@ -86,7 +86,7 @@ The `RDF.Graph.put_annotations/3` and `RDF.Graph.put_annotation_properties/3` wo
 `RDF.Graph.delete_annotations/2` deletes all annotations of the a given set of statements, while `RDF.Graph.delete_annotations/2` deletes only those with the given predicate(s).
 
 ```elixir
-iex> RDF.Graph.delete_annotations(graph, EX.S2 |> EX.p2("Foo", "Bar"))
+iex> RDF.Graph.delete_annotations(graph, EX.S2 |> EX.p2(["Foo", "Bar"]))
 #RDF.Graph<name: nil
   @prefix ex: <http://example.com/> .
 
@@ -95,7 +95,7 @@ iex> RDF.Graph.delete_annotations(graph, EX.S2 |> EX.p2("Foo", "Bar"))
       ex:ap2 ex:AO2 .
 >
 
-iex> RDF.Graph.delete_annotations(graph, EX.S2 |> EX.p2("Foo", "Bar"), EX.ap1())
+iex> RDF.Graph.delete_annotations(graph, EX.S2 |> EX.p2(["Foo", "Bar"]), EX.ap1())
 #RDF.Graph<name: nil
   @prefix ex: <http://example.com/> .
 
@@ -118,7 +118,7 @@ iex> graph =
 ...>   RDF.graph(prefixes: [ex: EX]) 
 ...>   |> RDF.Graph.add([
 ...>     EX.S1 |> EX.p1(EX.O1),
-...>     EX.S2 |> EX.p2("Foo", "Bar")],
+...>     EX.S2 |> EX.p2(["Foo", "Bar"])],
 ...>     add_annotations: %{EX.ap1() => EX.AO1, EX.ap2() => EX.AO2})
 #RDF.Graph<name: nil
   @prefix ex: <http://example.com/> .
@@ -134,7 +134,7 @@ iex> graph =
               ex:ap2 ex:AO2 |} .
 >
 
-iex> RDF.Graph.put(graph, EX.S2 |> EX.p2("Foo", "Baz"),
+iex> RDF.Graph.put(graph, EX.S2 |> EX.p2(["Foo", "Baz"]),
 ...>   put_annotation_properties: %{EX.ap2() => EX.AO3})
 #RDF.Graph<name: nil
   @prefix ex: <http://example.com/> .
@@ -158,7 +158,7 @@ On `RDF.Graph.put/3` and `RDF.Graph.put_properties/3`, you can also specify what
 The `:delete_annotations_on_deleted` keyword option allows to say that all of these annotations should be deleted by providing the value `true`. 
 
 ```elixir
-iex> RDF.Graph.put(graph, EX.S2 |> EX.p2("Foo", "Baz"),
+iex> RDF.Graph.put(graph, EX.S2 |> EX.p2(["Foo", "Baz"]),
 ...>   put_annotation_properties: %{EX.ap2() => EX.AO3},
 ...>   delete_annotations_on_deleted: true)
 #RDF.Graph<name: nil
@@ -181,7 +181,7 @@ The `:add_annotations_on_deleted`, `:put_annotations_on_deleted`,
   `:put_annotation_properties_on_deleted` allow to provide annotations, which should be add about the deleted statements with the respective overwrite logic.
 
 ```elixir
-iex> RDF.Graph.put(graph, EX.S2 |> EX.p2("Foo", "Baz"),
+iex> RDF.Graph.put(graph, EX.S2 |> EX.p2(["Foo", "Baz"]),
 ...>   put_annotation_properties: %{EX.ap2() => EX.AO4},
 ...>   put_annotations_on_deleted: %{EX.ap3() => EX.AO3})
 #RDF.Graph<name: nil

@@ -11,6 +11,13 @@ RDF graphs and datasets can be read and written to files, strings or streams in 
 {:ok, nquad_string} = RDF.NQuads.write_string(graph)
 ```
 
+::: tip
+
+`use RDF` defines an `alias` for all of the serializations format implemented in RDF.ex, so that you can use them via `NTriples`, `NQuads` and `Turtle.`
+
+:::
+
+
 All of the read and write functions are also available in bang variants which will fail in error cases.
 
 All of these `read_*` and `write_*` functions are also available in the top-level `RDF` module, where the serialization format can be specified in various ways, either by providing the format name via the `format` option, or via the `media_type` option. 
@@ -58,7 +65,7 @@ This feature can also be combined with file access via streams.
 
 ## Base IRI
 
-For serialization formats which support it, you can provide a base IRI on the read functions with the `base_iri` option. If you don't pass it, the base IRI associated with the serialized graph is used. This is automatically set on deserialization to the one used in serialization or you set it on the graph with the `RDF.Graph.set_base_iri/2` function, which also also accepts [`RDF.Vocabulary.Namespace` modules](/rdf-ex/vocabularies).
+For serialization formats which support it, you can provide a base IRI on the read functions with the `base_iri` option. If you don't pass it, the base IRI associated with the serialized graph is used. This is automatically set on deserialization to the one used in serialization or you set it on the graph with the `RDF.Graph.set_base_iri/2` function, which also also accepts [`RDF.Vocabulary.Namespace` modules](/rdf-ex/namespaces).
 
 
 ```elixir

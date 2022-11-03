@@ -10,27 +10,28 @@ It consists of two building-blocks (which can also be used independently of each
 
 ## Description builder
 
-The functions for the properties on a `RDF.Vocabulary.Namespace` module, which return the `RDF.IRI` of the property (see [here](/rdf-ex/vocabularies) for an introduction to `RDF.Vocabulary.Namespace`s), are also available in a description builder variant, that accepts a subject and objects as arguments.
+The functions for the properties on a `RDF.Vocabulary.Namespace` module, which return the `RDF.IRI` of the property (see [here](/rdf-ex/namespaces) for an introduction to `RDF.Vocabulary.Namespace`s), are also available in a description builder variant, that accepts a subject and objects as arguments.
 
 ```elixir
 RDF.type(EX.Foo, EX.Bar)
 ```
 
-If you want to state multiple statements with the same subject and predicate, you can either pass the objects as a list or as additional arguments, if there are not more than five of them:
+If you want to state multiple statements with the same subject and predicate, you can pass the objects as a list:
 
 ```elixir
-RDF.type(EX.Foo, EX.Bar, EX.Baz)
-EX.foo(EX.Bar, [1, 2, 3, 4, 5, 6])
+RDF.type(EX.Foo, [EX.Bar, EX.Baz])
+EX.foo(EX.Bar, [42, EX.Baz])
 ```
 
-The produced statements are returned by this function as a `RDF.Description` structure. Since the first argument of these property functions for the subject, also accept an `RDF.Description` (just using its subject as the subject for newly generated triple), the calls of these functions can be nested easily.
+The produced statements are returned by this function as a `RDF.Description` structure. Since the first argument of these property functions also accept an `RDF.Description` for the subject (just using its subject as the subject for newly generated triple), the calls of these functions can be nested easily.
 In combination with Elixirs pipe operators this leads to a way to describe RDF resources which resembles [Turtle](https://www.w3.org/TR/turtle/):
 
 ```elixir
 EX.Foo
 |> RDF.type(EX.Bar)
-|> EX.baz(1, 2, 3)
+|> EX.baz([1, 2, 3])
 ```
+
 This will produce this `RDF.Description`:
 
 ```
@@ -47,10 +48,10 @@ This will produce this `RDF.Description`:
 Full RDF graphs can be build with the `RDF.Graph.build/2` macro. It uses a `do` block in which you can write down RDF triples in any form supported by RDF.ex (including `RDF.Description`s with the description DSL) or Elixir expressions which return any of these forms.
 These triples will be added to the created `RDF.Graph` the macro returns.
 
-As usual, you'll have to `require RDF.Graph` to be able to use the macro.
+As usual, you'll have to `require RDF.Graph` to be able to use the macro or just `use RDF`.
 
 ```elixir
-require RDF.Graph
+use RDF
 alias NS.EX
 
 RDF.Graph.build do
@@ -58,7 +59,7 @@ RDF.Graph.build do
 
   EX.S2
   |> EX.p1(EX.O2)
-  |> EX.p2(1, 2, 3)
+  |> EX.p2([1, 2, 3])
   
   %{
     EX.S3 => %{
@@ -107,7 +108,36 @@ RDF.Graph.build do
 end
 ```
 
-Instead of aliasing vocabulary namespaces in the surrounding module, you can also declare them inside of the build block via `@prefix`. This will not only create an alias for the vocabulary namespace in the build block, but adds it as a prefix to the created `RDF.Graph`. By default, it will use the downcased and underscored name of the vocabulary namespace module (resp. the last segment of its fully qualified name), but you can also define a custom prefix by providing it as the key in a keyword tuple after the `@prefix`, instead of just defining the vocabulary namespace module.
+In order to not pollute the context of the `build` caller with these auto-`alias`es and -`import`s, the build block is isolated under the hood from the caller context. But this also means variables from the caller context are not available in the build block. If you want to use them in build block, you'll have to rebind the variables in a keyword list as the first argument of the `build` call.
+
+```elixir
+use RDF
+
+foo = 42
+
+RDF.Graph.build foo: foo do
+  {EX.S, EX.p(), foo}
+end
+```
+
+The same applies to `import`s and `require`s from the caller context. You'll have to re-`import` or re-`require` them. Aliases from the caller context, however, are all available because they are re-`alias`ed automatically in the build block.
+
+```elixir
+use RDF
+alias EX
+import Something
+
+RDF.Graph.build do
+  # Something is not imported here and needs to be 
+  # re-imported again to be available
+  import Something
+
+  # EX is available  
+  {EX.S, something(), EX.O}
+end
+```
+
+Instead of aliasing vocabulary namespaces in the surrounding module, however, you can also declare them inside of the build block with a `@prefix` definition. This will not only create an alias for the vocabulary namespace in the build block, but adds it as a prefix to the created `RDF.Graph`. By default, it will use the downcased and underscored name of the vocabulary namespace module (resp. the last segment of its fully qualified name), but you can also define a custom prefix by providing it as the key in a keyword tuple after the `@prefix`, instead of just defining the vocabulary namespace module.
 
 ```elixir
 require RDF.Graph
@@ -124,7 +154,7 @@ RDF.Graph.build do
   ~I<http://example.org/#spiderman>
     |> a(FOAF.Person)
     |> Rel.enemyOf(~I<http://example.org/#green-goblin>)
-    |> FOAF.name("Spiderman", ~L"Человек-паук"ru)
+    |> FOAF.name(["Spiderman", ~L"Человек-паук"ru])
 end
 ```
 
@@ -150,21 +180,32 @@ This will build the following `RDF.Graph`:
 >
 ```
 
-::: warning
-
-A current limitation is that you have to provide the fully qualified name of a vocabulary namespace module in a `@prefix` (also in the base URI declarations described below). Also, aliasing some part of the namespace like in the following won't work currently.
+When you want to use terms from a URI namespace for which you don't have `RDF.Vocabulary.Namespace` defined in your application, you can define an ad-hoc namespace in your `build` block with a `@prefix` definition and a string with the URI namespace. In that case you must also provide the prefix to be used. The name for the generated ad-hoc vocabulary namespace will be the upper-cased version of the prefix.
 
 ```elixir
-require RDF.Graph
-alias Example.NS
-
 RDF.Graph.build do
-  @prefix NS.EX # this must be Example.NS.EX
-  # ...
+  @prefix ex: "http://example.com/ad-hoc/"
+
+  Ex.S |> Ex.p(Ex.O)
 end
 ```
+This will result in the following `RDF.Graph`:
 
-I hope to get this limitation removed sometime.
+```elixir
+#RDF.Graph<name: nil
+  @prefix ex: <http://example.com/ad-hoc/> .
+  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+  @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+  @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+  ex:S
+      ex:p ex:O .
+>
+```
+
+::: warning
+
+Unfortunately, for Elixir versions < 1.13 you might encounter undefined-function warnings for uses of lower-cased terms from ad-hoc namespaces defined with such `@prefix` definitions.
 
 :::
 
@@ -175,9 +216,9 @@ The base URI of the `RDF.Graph` can be specified with a `@base` declaration and 
 require RDF.Graph
 
 RDF.Graph.build do
-  @base NS.EX
-  @prefix NS.FOAF
-  @prefix NS.Rel
+  @base EX
+  @prefix FOAF
+  @prefix Rel
   
   ~I<#green-goblin>
     |> a(FOAF.Person)    
@@ -187,7 +228,7 @@ RDF.Graph.build do
   ~I<#spiderman>
     |> a(FOAF.Person)
     |> Rel.enemyOf(~I<#green-goblin>)
-    |> FOAF.name("Spiderman", ~L"Человек-паук"ru)
+    |> FOAF.name(["Spiderman", ~L"Человек-паук"ru])
 end
 ```
 
@@ -218,7 +259,7 @@ Now, we're building this `RDF.Graph`:
 So far, all examples have shown fixed triple structures only, but the build blocks can include any Elixir expression, as long it returns RDF data in any of the forms supported by RDF.ex.
 
 ```elixir
-RDF.Graph.build do
+RDF.Graph.build file: file, args: args, rank: rank do
   @base "http://chess.example.com/"
   ExampleModule.function_returning_rdf(args)
 
@@ -234,7 +275,7 @@ end
 If an expression evaluates to `nil` or `:ok`, it will be excluded automatically. This enables the use of conditionals and the use of the logger in your build blocks:
 
 ```elixir
-RDF.Graph.build do
+RDF.Graph.build args: args do
   # the nil result in the negative case is ignored
   if someCondition?(args) do
     ExampleModule.function_returning_rdf(args)
@@ -272,7 +313,7 @@ end
 The fact that assignments are not added to the graph, allows you to use them to ignore an expression in a build block, which does return something you don't want to include in the built RDF graph.
 
 ```elixir
-RDF.Graph.build do
+RDF.Graph.build args: args do
   _ = function_with_side_effects()
 
   ExampleModule.function_returning_rdf(args)
@@ -282,7 +323,7 @@ end
 Note that the assignments are still pattern matches, so they can be used as validation guards.
 
 ```elixir
-RDF.Graph.build do
+RDF.Graph.build args: args do
   {:ok, _} = function_with_side_effects()
 
   ExampleModule.function_returning_rdf(args)
@@ -292,17 +333,17 @@ end
 Finally, you can also exclude the result of an expression from inclusion in the built RDF graph more explicitly, by prepending it with the `exclude` function.
 
 ```elixir
-RDF.Graph.build do
+RDF.Graph.build args: args do
   exclude function_with_side_effects()
 
   ExampleModule.function_returning_rdf(args)
 end
 ```
 
-The `RDF.Graph.build/2` function also accepts all options available on `RDF.Graph.new/2`, which it will use to create the initial `RDF.Graph` to which the triples in the build block are added. The `@prefix`es and `@base` URI declared within the build block will overwrite the ones from `:prefixes` and `:base` keyword options.
+The `RDF.Graph.build/2` function also accepts all options available on `RDF.Graph.new/2` as the second argument, which it will use to create the initial `RDF.Graph` to which the triples in the build block are added. The `@prefix`es and `@base` URI declared within the build block will overwrite the ones from `:prefixes` and `:base` keyword options.
 
 ```elixir
-require RDF.Graph
+use RDF
 alias NS.EX
 
 opts = [
@@ -315,9 +356,9 @@ opts = [
   init: {EX.Foo, EX.Bar, EX.Baz}
 ]
 
-RDF.Graph.build opts do
+RDF.Graph.build [], opts do
   @base "http://base_iri/B"
-  @prefix ex: NS.EX
+  @prefix ex: EX
 
   EX.S |> EX.p(EX.O)
 end

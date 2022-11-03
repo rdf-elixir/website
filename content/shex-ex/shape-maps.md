@@ -14,7 +14,7 @@ The start shape of a schema can referenced with the atom `:start`.
 ShEx.shape_map(%{~I<http://example.com/nodeB> => :start})
 ```
 
-When nodes and shape identifiers are given as native Elixir values they will be coerced to respective RDF terms. This also includes terms of an [RDF vocabulary namespace](/../rdf-ex/vocabularies).
+When nodes and shape identifiers are given as native Elixir values they will be coerced to respective RDF terms. This also includes terms of an [RDF vocabulary namespace](/../rdf-ex/namespaces).
 
 ```elixir
 ShEx.shape_map(%{"http://example.com/nodeA" => EX.Shape})

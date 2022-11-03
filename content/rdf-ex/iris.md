@@ -26,4 +26,10 @@ import RDF.Sigils
 ~i<http://www.example.com/#{fun(args)}>
 ```
 
+::: tip
+
+Instead of the `import RDF.Sigils` required to be able to use the sigils defined by RDF.ex, you can also just write `use RDF` which combines the most important `import`s and `alias`es.
+
+:::
+
 But there's an even shorter notation for IRI literals.

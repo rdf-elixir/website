@@ -22,7 +22,8 @@ iex> RDF.literal("foo") |> RDF.Literal.value()
 An untyped literal can also be created with the `~L` sigil or the `~l` which supports string interpolation:
 
 ```elixir
-import RDF.Sigils
+use RDF
+# or an explicit: import RDF.Sigils
 
 ~L"foo"
 
@@ -95,8 +96,8 @@ For all of the supported RDF and XSD datatypes there are `RDF.Literal.Datatype` 
 They also provide a `new` constructor function that allows the creation of `RDF.Literal`s with the respective datatype. These constructor can also be called via the alias functions on the top-level `RDF` respective `RDF.XSD` namespace.
 
 ```elixir
-# we'll consider the following alias to be defined throughout this guide implicitly
-alias RDF.XSD
+use RDF # this automatically defines an alias RDF.XSD
+# we'll consider this alias to be defined throughout this guide implicitly
 
 XSD.String.new("foo")
 XSD.string("foo")
@@ -149,7 +150,7 @@ Besides the `RDF.LangString` datatype the following XSD datatypes are provided a
 | `xsd:gMonthDay` | ❌ |
 | `xsd:gDay` | ❌ |
 | `xsd:gMonth` | ❌ |
-| `xsd:base64Binary` | ❌ |
+| `xsd:base64Binary` | `RDF.XSD.Base64Binary` |
 | `xsd:hexBinary` | ❌ |
 | `xsd:anyURI` | `RDF.XSD.AnyURI` |
 | `xsd:QName` | ❌ |
@@ -162,10 +163,10 @@ For literals with an unknown datatype, i.e. a datatype without a `RDF.Literal.Da
 The `RDF.Literal.valid?/1` function checks if a given literal is valid according to the semantics in its `RDF.Literal.Datatype` implementation.
 
 ```elixir
-iex> RDF.Literal.valid? XSD.integer("42")
+iex> RDF.Literal.valid?(XSD.integer("42"))
 true
 
-iex> RDF.Literal.valid? XSD.integer("foo")
+iex> RDF.Literal.valid?(XSD.integer("foo"))
 false
 ```
 
@@ -179,21 +180,23 @@ If you want to prohibit the creation of invalid literals, you can use the `new!`
 A RDF literal is bound to the lexical form of the initially given value. This lexical representation can be retrieved with the `RDF.Literal.lexical/1` function:
 
 ```elixir
-iex> RDF.Literal.lexical XSD.integer("0042")
+iex> RDF.Literal.lexical(XSD.integer("0042"))
 "0042"
 
-iex> RDF.Literal.lexical XSD.integer(42)
+iex> RDF.Literal.lexical(XSD.integer(42))
 "42"
 ```
 
 The `RDF.Literal.canonical/1` function normalizes the given literal to the canonical lexical form according to its datatype:
 
 ```elixir
-iex> RDF.integer("0042") |> RDF.Literal.canonical |> RDF.Literal.lexical
+iex> RDF.integer("0042") 
+...> |> RDF.Literal.canonical()
+...> |> RDF.Literal.lexical()
 "42"
 
 iex> RDF.Literal.canonical(RDF.integer("0042")) == 
-     RDF.Literal.canonical(RDF.integer("42"))
+...> RDF.Literal.canonical(RDF.integer("42"))
 true
 ```
 
@@ -204,7 +207,7 @@ Since the canonical form is undefined for invalid literals, `nil` is returned in
 If you're just interested in the canonical lexical form as a string you can also use the `RDF.Literal.canonical_lexical/1` function, which is also a bit faster, since the intermediary canonicalization is not needed.
 
 ```elixir
-iex> RDF.Literal.canonical_lexical XSD.integer("0042")
+iex> RDF.Literal.canonical_lexical(XSD.integer("0042"))
 "42"
 ```
 
@@ -213,7 +216,8 @@ iex> RDF.Literal.canonical_lexical XSD.integer("0042")
 Although two literals might have the same value, they are not equal if they don't have the same lexical form:
 
 ```elixir
-iex> RDF.Literal.value(XSD.integer("0042")) == RDF.Literal.value(XSD.integer("42"))
+iex> RDF.Literal.value(XSD.integer("0042")) == 
+...> RDF.Literal.value(XSD.integer("42"))
 true
 
 iex> XSD.integer("0042") == XSD.integer("42")
@@ -223,16 +227,20 @@ false
 The `RDF.Literal.equal_value?/2` function however, does a pure value-based equivalence comparison. It also takes into account compatibilities between different types, eg. derived datypes. Since it is the basis for the implementation of SPARQLs `=` operator in SPARQL.ex everything that is equivalent in terms of this operator will match. Literals which aren't comparable in general due to their type and would result in an error match in terms of the SPARQL `=` operator (meaning that also the negation wouldn't match) will return `nil`. Above this, it also coerces native Elixir values to `RDF.Literal`s before doing the comparison.
 
 ```elixir
-iex> XSD.integer("0042") |> RDF.Literal.equal_value?(XSD.integer("42"))
+iex> XSD.integer("0042") 
+...> |> RDF.Literal.equal_value?(XSD.integer("42"))
 true
 
-iex> XSD.integer("0042") |> RDF.Literal.equal_value?(42)
+iex> XSD.integer("0042") 
+...> |> RDF.Literal.equal_value?(42)
 true
 
-iex> XSD.integer("0042") |> RDF.Literal.equal_value?(XSD.short(42))
+iex> XSD.integer("0042") 
+...> |> RDF.Literal.equal_value?(XSD.short(42))
 true
 
-iex> XSD.anyURI("http://example.com") |> RDF.Literal.equal_value?(RDF.iri("http://example.com"))
+iex> XSD.anyURI("http://example.com") 
+...> |> RDF.Literal.equal_value?(RDF.iri("http://example.com"))
 true
 
 iex> XSD.integer("0042") |> RDF.Literal.equal_value?(XSD.string("42"))
@@ -297,20 +305,19 @@ defmodule MyApp.PersonAge do
 end
 ```
 
-This datatype can now constructed by either its `new` constructor or via the generic typed  `RDF.Literal` constuctor and the specified datatype URI.
+This datatype can now constructed by either its `new` constructor or via the generic typed `RDF.Literal` constuctor and the specified datatype URI.
 
 ```elixir
-iex> MyApp.PersonAge.new(42)
-%RDF.Literal{literal: %MyApp.PersonAge{value: 42, lexical: "42"}, valid: true}
-
-iex> RDF.literal(42, datatype: "http://example.com/person_age")
-%RDF.Literal{literal: %MyApp.PersonAge{value: 42, lexical: "42"}, valid: true}
+iex> MyApp.PersonAge.new(42) == 
+...> RDF.literal(42, datatype: "http://example.com/person_age")
+true
 ```
 
 Within RDF.ex and the libraries on top of it (SPARQL.ex, ShEx.ex) this datatype can be used wherever a `xsd:nonNegativeInteger` or `xsd:integer` is expected.
 
 ```elixir
-iex> XSD.integer(42) |> RDF.Literal.equal_value?(MyApp.PersonAge.new(42))
+iex> XSD.integer(42) 
+...> |> RDF.Literal.equal_value?(MyApp.PersonAge.new(42))
 true
 ```
 
@@ -353,6 +360,17 @@ def fun(%RDF.Literal{literal: %XSD.Integer{}} = integer_literal), do: ...
 def fun(%RDF.Literal{literal: %My.Custom.Datatype{}} = my_literal), do: ...
 ```
 
+A datatype pattern match on a literal can also be performed with the `RDF.Guard.is_rdf_literal/2` guard, which checks if datatype module given as the second argument matches the literal given as the first argument.
+
+```elixir
+use RDF 
+# or an explicit: import RDF.Guards
+
+def fun(value) when is_rdf_literal(value, XSD.Integer), do: ...
+
+def fun(value) when is_rdf_literal(value, My.Custom.Datatype), do: ...
+```
+
 Literals with a datatype for which no `RDF.Literal.Datatype` is defined can be pattern matched via the `datatype` of the `RDF.Literal.Generic` datatype.
 
 ```elixir
@@ -375,15 +393,13 @@ true
 iex> XSD.byte(42) |> XSD.NegativeInteger.datatype?()
 false
 
-iex> XSD.byte(42) |> XSD.Decimal.datatype?()
-TODO: ??? 
-
 # assuming My.Custom.Datatype is derived from xsd:integer or one of its derived datatypes
 iex> My.Custom.Datatype.new(42) |> XSD.Integer.datatype?()
 true
 
 # assuming there's a custom RDF.Literal.Datatype for http://example.com/dt defined and it is derived from a xsd:integer
-iex> RDF.literal("foo", datatype: "http://example.com/dt") |> XSD.Integer.datatype?()
+iex> RDF.literal("foo", datatype: "http://example.com/dt") 
+...> |> XSD.Integer.datatype?()
 true
 ```
 
@@ -405,7 +421,7 @@ iex> RDF.literal("foo", datatype: "http://example.com/dt") |> XSD.Numeric.dataty
 false
 ```
 
-The general purpose type check function `RDF.Literal.is_a?/2` supports all of these `datatype?/1` functions
+The general purpose type checking function `RDF.Literal.is_a?/2` supports all of these `datatype?/1` functions
 
 ```elixir
 iex> XSD.byte(42) |> RDF.Literal.is_a?(XSD.Byte)
@@ -424,7 +440,8 @@ iex> RDF.langString("foo", language: "en") |> RDF.Literal.is_a?(XSD.Datatype)
 false
 
 # assuming there's no custom RDF.Literal.Datatype for http://example.com/dt
-iex> RDF.literal("foo", datatype: "http://example.com/dt") |> RDF.Literal.is_a?(RDF.Literal.Generic)
+iex> RDF.literal("foo", datatype: "http://example.com/dt") 
+...> |> RDF.Literal.is_a?(RDF.Literal.Generic)
 true
 ```
 

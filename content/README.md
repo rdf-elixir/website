@@ -16,18 +16,20 @@ features:
   details: >-
     A light-weight graph data mapper which maps RDF graph data from RDF.ex data structures to schema-conform Elixir structs for the domain models of an RDF-based application.
 footer: >-
-    MIT Licensed | Copyright © 2017-present Marcel Otto
+    MIT Licensed | © 2016-2022 Marcel Otto
     
 ---
 
 ```elixir
+use RDF
+
 def schema_org_description do
   ~I<https://rdf-elixir.dev>
   |> RDF.type(Schema.Website)
-  |> Schema.about(
+  |> SchemaOrg.about(
        ~I<https://github.com/rdf-elixir/rdf-ex>,
        ~I<https://github.com/rdf-elixir/sparql-ex>,
-       ~I<https://github.com/rdf-elixir/shex-ex>
+       ~I<https://github.com/rdf-elixir/grax>
      )
   |> JSON.LD.write_file!("description.jsonld")
 end

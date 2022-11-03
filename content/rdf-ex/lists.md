@@ -40,7 +40,10 @@ The function `RDF.List.values/1` allows to get the values of a RDF list (includi
 
 ```elixir
 iex> RDF.list(["foo", EX.Bar, ~B<bar>, [1, 2]]) |> RDF.List.values
-[~L"foo", ~I<http://www.example.com/ns/Bar>, ~B<bar>,
- [%RDF.Literal{value: 1, datatype: ~I<http://www.w3.org/2001/XMLSchema#integer>},
-  %RDF.Literal{value: 2, datatype: ~I<http://www.w3.org/2001/XMLSchema#integer>}]]
+[
+  ~L"foo",
+  ~I<http://example.com/Bar>,
+  ~B<bar>,
+  [RDF.XSD.Integer.new(1), RDF.XSD.Integer.new(2)]
+]
 ```

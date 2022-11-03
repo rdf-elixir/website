@@ -13,7 +13,8 @@ RDF.bnode
 You can also use the `~B` sigil to create a blank node with a custom name:
 
 ```elixir
-import RDF.Sigils
+use RDF
+# or an explicit: import RDF.Sigils
 
 ~B<foo>
 ```
@@ -21,7 +22,7 @@ import RDF.Sigils
 The `~b` sigil which supports string interpolation is also available:
 
 ```elixir
-import RDF.Sigils
+use RDF
 
 ~B<foo#{i}>
 ```

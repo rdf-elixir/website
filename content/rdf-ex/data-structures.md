@@ -144,33 +144,33 @@ The input can be further shortened with the use of `RDF.PropertyMap`s, which are
 
 ```elixir
 iex> RDF.PropertyMap.new(%{type: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"})
-%RDF.PropertyMap{:type <=> ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>}
+RDF.PropertyMap.new(%{:type => ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>})
 
 iex> RDF.property_map(foo: EX.foo, bar: EX.Bar)
-%RDF.PropertyMap{
-  :bar <=> ~I<http://example.com/Bar>,
-  :foo <=> ~I<http://example.com/foo>
-}
+RDF.PropertyMap.new(%{
+  :bar => ~I<http://example.com/Bar>,
+  :foo => ~I<http://example.com/foo>
+})
 ```
 
 PropertyMaps can also be created from strict vocabulary namespaces, where term mappings are added for lowercased terms.
 
 ```elixir
 iex> RDF.property_map(RDFS)
-%RDF.PropertyMap{
-  :comment <=> ~I<http://www.w3.org/2000/01/rdf-schema#comment>,
-  :domain <=> ~I<http://www.w3.org/2000/01/rdf-schema#domain>,
-  :isDefinedBy <=> ~I<http://www.w3.org/2000/01/rdf-schema#isDefinedBy>,
-  :label <=> ~I<http://www.w3.org/2000/01/rdf-schema#label>,
-  :member <=> ~I<http://www.w3.org/2000/01/rdf-schema#member>,
-  :range <=> ~I<http://www.w3.org/2000/01/rdf-schema#range>,
-  :seeAlso <=> ~I<http://www.w3.org/2000/01/rdf-schema#seeAlso>,
-  :subClassOf <=> ~I<http://www.w3.org/2000/01/rdf-schema#subClassOf>,
-  :subPropertyOf <=> ~I<http://www.w3.org/2000/01/rdf-schema#subPropertyOf>
-}
+RDF.PropertyMap.new(%{
+  :comment => ~I<http://www.w3.org/2000/01/rdf-schema#comment>,
+  :domain => ~I<http://www.w3.org/2000/01/rdf-schema#domain>,
+  :isDefinedBy => ~I<http://www.w3.org/2000/01/rdf-schema#isDefinedBy>,
+  :label => ~I<http://www.w3.org/2000/01/rdf-schema#label>,
+  :member => ~I<http://www.w3.org/2000/01/rdf-schema#member>,
+  :range => ~I<http://www.w3.org/2000/01/rdf-schema#range>,
+  :seeAlso => ~I<http://www.w3.org/2000/01/rdf-schema#seeAlso>,
+  :subClassOf => ~I<http://www.w3.org/2000/01/rdf-schema#subClassOf>,
+  :subPropertyOf => ~I<http://www.w3.org/2000/01/rdf-schema#subPropertyOf>
+})
 ```
 
-All functions accepting input data support a `:context` option for which you can either pass a `RDF.ProperyMap` directly or one of the values from which a `RDF.ProperyMap` can be created implicitly. If the `:context` is defined you can use the atoms for the properties in any of the input forms.
+All functions accepting input data support a `:context` option for which you can either pass a `RDF.PropertyMap` directly or one of the values from which a `RDF.PropertyMap` can be created implicitly. If the `:context` is defined you can use the atoms for the properties in any of the input forms.
 
 ```elixir
 property_map = RDF.property_map(foo: EX.foo)
@@ -470,6 +470,14 @@ iex> RDF.Description.new(EX.S1, init: {EX.p, [EX.O1, EX.O2]})
 iex> RDF.Graph.new({EX.S1, EX.p, [EX.O1, EX.O2]})
 ...> |> RDF.Graph.fetch(EX.p2)
 :error
+```
+
+Finally, the function for a property on a `RDF.Vocabulary.Namespace` can be used to access the respective objects from a `RDF.Description`. By passing it a `RDF.Description` it can be used as a shortcut for the `RDF.Description.get/2` function.
+
+```elixir
+iex> RDF.Description.new(EX.S1, init: {EX.p, [EX.O1, EX.O2]})
+...> |> EX.p()
+[~I<http://example.com/O1>, ~I<http://example.com/O2>]
 ```
 
 `RDF.Dataset` also provides the following functions to access individual graphs:

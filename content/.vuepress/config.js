@@ -84,7 +84,7 @@ function getRDFSidebar () {
         '',
         'installation',
         'iris',
-        'vocabularies',
+        'namespaces',
         'blank-nodes',
         'literals',
         'statements',

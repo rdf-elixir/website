@@ -99,7 +99,7 @@ end
 
 ::: warning
 
-We'll constantly use terms from RDF.ex vocabulary namespaces. These are modules and functions on these modules, which can be used instead of URIs in the Elixir code. If you're new to RDF.ex, you can read more about this [here](/rdf-ex/vocabularies).
+We'll constantly use terms from RDF.ex vocabulary namespaces. These are modules and functions on these modules, which can be used instead of URIs in the Elixir code. If you're new to RDF.ex, you can read more about this [here](/rdf-ex/namespaces).
 :::
 
 You can also define properties in a more concise form with the `property/1` macro:

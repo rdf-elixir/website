@@ -5,7 +5,7 @@ The [RDF.ex Hex package](https://hex.pm/packages/rdf) can be installed as usual,
 ```elixir
 def deps do
   [
-    {:rdf, "~> 0.12"}
+    {:rdf, "~> 1.0"}
   ]
 end
 ```
@@ -16,8 +16,8 @@ If you want to read or write [RDF-XML](http://www.w3.org/TR/rdf-syntax-grammar/)
 ```elixir
 def deps do
   [
-    {:rdf, "~> 0.12"},
-    {:rdf_xml, "~> 0.1"},
+    {:rdf, "~> 1.0"},
+    {:rdf_xml, "~> 1.0"},
     {:json_ld, "~> 0.3"},
   ]
 end

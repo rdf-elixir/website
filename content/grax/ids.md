@@ -50,8 +50,10 @@ The Grax id spec module provides a `prefix_map/0` function which returns a `RDF.
 ```elixir
 iex> Example.IdSpec.prefix_map()
 %RDF.PrefixMap{
-  bar: ~I<http://example.com/bar#>,
-  foo: ~I<http://example.com/foo/>
+  map: %{
+    bar: ~I<http://example.com/bar#>, 
+    foo: ~I<http://example.com/foo/>
+  }
 }
 ```
 
