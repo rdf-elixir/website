@@ -603,6 +603,7 @@ iex> RDF.Description.new(EX.S1, init: {EX.p, [EX.O1, EX.O2]})
   <http://example.com/S1>
       <http://example.com/p> <http://example.com/O2> .
 >
+
 iex> RDF.Description.new(EX.S1, init: {EX.p, [EX.O1, EX.O2]})
 ...> |> RDF.Data.delete(RDF.Description.new(EX.S2, init: {EX.p, EX.O1}))
 #RDF.Description<
@@ -631,6 +632,7 @@ iex> RDF.Graph.equal?(
 ...>   RDF.graph(d, prefixes: %{ex: EX}), 
 ...>   RDF.graph(d, prefixes: %{ex: EX, xsd: XSD}))
 true
+
 ...> RDF.graph(d, prefixes: %{ex: EX}) ==
 ...>   RDF.graph(d, prefixes: %{ex: EX, xsd: XSD}))
 false
@@ -648,6 +650,44 @@ As opposed to `RDF.Graph.equal?/2` the `RDF.Data.equal?/2` function also doesn't
 ```elixir
 iex> RDF.Graph.equal?(RDF.graph(d), RDF.graph(d, name: EX.Graph))
 false
+
 iex> RDF.Data.equal?(RDF.graph(d), RDF.graph(d, name: EX.Graph))
 true
 ```
+
+If you want to check whether two graphs or datasets are the same, regardless of the concrete names of the blank nodes they contain (because they do not matter for the semantics of a graph), you can do this with the functions `RDF.Graph.isomorphic?/2` resp. `RDF.Dataset.isomorphic?/2`.
+
+```elixir
+iex> RDF.Graph.new([{~B<foo>, EX.p(), ~B<bar>}, {~B<bar>, EX.p(), 42}])
+...> |> RDF.Graph.isomorphic?(
+...>      RDF.Graph.new([{~B<b1>, EX.p(), ~B<b2>}, {~B<b2>, EX.p(), 42}]))
+true
+
+iex> RDF.Graph.new([{~B<foo>, EX.p(), ~B<bar>}, {~B<bar>, EX.p(), 42}])
+...> |> RDF.Graph.isomorphic?(
+...>      RDF.Graph.new([{~B<b1>, EX.p(), ~B<b2>}, {~B<b3>, EX.p(), 42}]))
+false
+```
+
+
+## Canonicalization
+
+An `RDF.Graph` or `RDF.Dataset` can be canonicalized with the standardized [RDF Dataset Canonicalization algorithm](https://www.w3.org/TR/rdf-canon/) with the functions `RDF.Graph.canonicalize/1` resp. `RDF.Dataset.canonicalize/1`.
+
+```elixir
+iex> RDF.Graph.new([{~B<foo>, EX.p(), ~B<bar>}, {~B<bar>, EX.p(), ~B<foo>}])
+...> |> RDF.Graph.canonicalize()
+#RDF.Graph<name: nil
+  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+  @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+  @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+  _:c14n0
+      <http://example.com/p> _:c14n1 .
+
+  _:c14n1
+      <http://example.com/p> _:c14n0 .
+>
+```
+
+
