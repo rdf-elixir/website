@@ -44,6 +44,7 @@ function getNav () {
     navItem('SPARQL.ex', '/sparql-ex/'),
     navItem('ShEx.ex', '/shex-ex/'),
     navItem('Grax', '/grax/'),
+    navItem('RTC.ex', '/rtc-ex/'),
     {
       text: 'API Documentation', items: [
         navItem('RDF.ex', 'https://hexdocs.pm/rdf/'),
@@ -51,7 +52,8 @@ function getNav () {
         navItem('SPARQL.Client', 'https://hexdocs.pm/sparql_client/'),
         navItem('ShEx.ex', 'https://hexdocs.pm/shex/'),
         navItem('JSON-LD.ex', 'https://hexdocs.pm/json_ld/'),
-        navItem('RDF-XML.ex', 'https://hexdocs.pm/rdf_xml/')
+        navItem('RDF-XML.ex', 'https://hexdocs.pm/rdf_xml/'),
+        navItem('RTC.ex', 'https://hexdocs.pm/rtc/')
       ]
     },
     navItem('Links', '/links')
@@ -71,7 +73,8 @@ function getSidebar () {
     '/rdf-ex/': getRDFSidebar(),
     '/sparql-ex/': getSPARQLSidebar(),
     '/shex-ex/': getShExSidebar(),
-    '/grax/': getGraxSidebar()
+    '/grax/': getGraxSidebar(),
+    '/rtc-ex/': getRTCSidebar()
   }
 }
 
@@ -146,6 +149,22 @@ function getGraxSidebar () {
         'schemas',
         'api',
         'ids'
+      ]
+    }
+  ]
+}
+
+function getRTCSidebar () {
+  return [
+    {
+      title: 'RTC.ex',
+      collapsable: false,
+      children: [
+        '',
+        'installation',
+        'basic-graph-api',
+        'annotations',
+        'compound-hierarchies'
       ]
     }
   ]
