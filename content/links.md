@@ -35,6 +35,12 @@ sidebar: false
 
 # Books
 
+<br>
+
+<p style="text-align:center;">
+<img src="https://pragprog.com/titles/thgraphs/exploring-graphs-with-elixir/thgraphs-500.jpg"  width="40%" height="40%">
+</p>
+
 - [Tony Hammond: "Exploring Graphs with Elixir - Connect Data with Native Graph Libraries and Graph Databases", The Pragmatic Programmers, 2022](https://pragprog.com/titles/thgraphs/exploring-graphs-with-elixir/)
 
 
