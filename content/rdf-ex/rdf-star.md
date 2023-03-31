@@ -46,7 +46,7 @@ iex> RDF.graph()
 
 ## Annotation API
 
-Although quoted triples can appear on both the subject and/or object position, the by far most and in many cases only use is on the subject position. 
+Although quoted triples can appear on both the subject and/or object position, they are used on the subject position most of the time. 
 We call RDF-star statements like these, i.e. where the subject is a quoted triple, _annotations_.
 
 ::: warning
