@@ -2,30 +2,17 @@
 sidebar: false
 ---
 
-# Hex packages
+# Projects
 
-- [RDF.ex](https://hex.pm/packages/rdf)
-- [JSON-LD.ex](https://hex.pm/packages/json_ld)
-- [RDF-XML.ex](https://hex.pm/packages/rdf_xml)
-- [SPARQL.ex](https://hex.pm/packages/sparql)
-- [SPARQL.Client](https://hex.pm/packages/sparql_client)
-- [ShEx.ex](https://hex.pm/packages/shex)
-- [Grax](https://hex.pm/packages/grax)
-- [RTC.ex](https://hex.pm/packages/rtc)
-- [Skout](https://hex.pm/packages/skout)
-
-
-# Github projects
-
-- [RDF.ex](https://github.com/rdf-elixir/rdf-ex)
-- [JSON-LD.ex](https://github.com/rdf-elixir/jsonld-ex)
-- [RDF-XML.ex](https://github.com/rdf-elixir/rdf-xml-ex)
-- [SPARQL.ex](https://github.com/rdf-elixir/sparql-ex)
-- [SPARQL.Client](https://github.com/rdf-elixir/sparql_client)
-- [ShEx.ex](https://github.com/rdf-elixir/shex-ex)
-- [Grax](https://github.com/rdf-elixir/grax)
-- [RTC.ex](https://github.com/rtc-org/rtc-ex)
-- [Skout](https://github.com/marcelotto/skout)
+- RDF.ex:        [GitHub](https://github.com/rdf-elixir/rdf-ex), [Hex](https://hex.pm/packages/rdf), [HexDocs](https://hexdocs.pm/rdf)
+- JSON-LD.ex:    [GitHub](https://github.com/rdf-elixir/jsonld-ex), [Hex](https://hex.pm/packages/json_ld), [HexDocs](https://hexdocs.pm/json_ld)
+- RDF-XML.ex:    [GitHub](https://github.com/rdf-elixir/rdf-xml-ex), [Hex](https://hex.pm/packages/rdf_xml), [HexDocs](https://hexdocs.pm/rdf_xml)
+- SPARQL.ex:     [GitHub](https://github.com/rdf-elixir/sparql-ex), [Hex](https://hex.pm/packages/sparql), [HexDocs](https://hexdocs.pm/sparql)
+- SPARQL.Client: [GitHub](https://github.com/rdf-elixir/sparql_client), [Hex](https://hex.pm/packages/sparql_client), [HexDocs](https://hexdocs.pm/sparql_client)
+- ShEx.ex:       [GitHub](https://github.com/rdf-elixir/shex-ex), [Hex](https://hex.pm/packages/shex), [HexDocs](https://hexdocs.pm/shex)
+- Grax:          [GitHub](https://github.com/rdf-elixir/grax), [Hex](https://hex.pm/packages/grax), [HexDocs](https://hexdocs.pm/grax)
+- RTC.ex:        [GitHub](https://github.com/rtc-org/rtc-ex), [Hex](https://hex.pm/packages/rtc), [HexDocs](https://hexdocs.pm/rtc)
+- Skout:         [GitHub](https://github.com/marcelotto/skout), [Hex](https://hex.pm/packages/skout), [HexDocs](https://hexdocs.pm/skout)
 
 
 # Social channels
