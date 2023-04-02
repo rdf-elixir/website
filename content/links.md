@@ -11,6 +11,7 @@ sidebar: false
 - [SPARQL.Client](https://hex.pm/packages/sparql_client)
 - [ShEx.ex](https://hex.pm/packages/shex)
 - [Grax](https://hex.pm/packages/grax)
+- [RTC.ex](https://hex.pm/packages/rtc)
 - [Skout](https://hex.pm/packages/skout)
 
 
@@ -23,6 +24,7 @@ sidebar: false
 - [SPARQL.Client](https://github.com/rdf-elixir/sparql_client)
 - [ShEx.ex](https://github.com/rdf-elixir/shex-ex)
 - [Grax](https://github.com/rdf-elixir/grax)
+- [RTC.ex](https://github.com/rtc-org/rtc-ex)
 - [Skout](https://github.com/marcelotto/skout)
 
 
