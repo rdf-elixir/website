@@ -359,3 +359,48 @@ iex> iri(EX.Bar)
 ```
 
 
+## Namespace delegator modules
+
+Sometimes you want that modules of your application act as namespace modules. 
+For example, when you are developing an application for which you have defined a dedicated vocabulary, you may not want to have a separate namespace for the vocabulary with the same name and provoke naming conflicts or confusion between the application and the RDF namespace module. In such cases, you can define a `RDF.Namespace` or `RDF.Vocabulary.Namespace` and specify with the `RDF.Namespace.act_as_namespace/1` macro, that another module should act as the specified RDF namespace.
+
+```elixir
+defmodule Example.NS do
+  use RDF.Vocabulary.Namespace
+
+  defvocab Example,
+    base_iri: "http://www.example.com/ns/",
+    terms: [:Foo, :bar]
+end
+
+defmodule Example do
+  import RDF.Namespace
+
+  act_as_namespace Example.NS.Example
+
+  # your application functions
+end
+```
+
+This definition allows you to use the `Example` module with your application functions as a full replacement for the `Example.NS.Example` vocabulary namespace:
+
+```elixir
+iex> Example.Foo |> Example.bar(42)
+#RDF.Description<subject: ~I<http://www.example.com/ns/Foo>
+  <http://www.example.com/ns/Foo>
+      <http://www.example.com/ns/bar> 42 .
+>
+```
+
+::: tip
+
+The definition of a `RDF.Namespace` can be very useful in this context, when your application vocabulary spans multiple URI namespaces.
+
+::: 
+
+::: warning
+
+Be aware that this also defines the functions for the lowercased terms (including the one and two argument variants from the [description DSL](description-and-graph-dsl.html#description-builder)) on this module, thus limiting your ability to use these names for business functions within this module.
+
+:::
+
