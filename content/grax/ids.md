@@ -7,7 +7,7 @@ This chapter explains the definition and use of those Grax id specs and enable y
 
 ## Namespaces
 
-A Grax id spec module first has to `use Grax.Id.Spec` to make the necessary macros available. With that, you can start to lay out the structure of the namespace the identifiers with the `namespace/1` macro. It takes a string with a fragment of a URI and a `do` block which consists of nested `namespace` calls or definitions of id schemas, which we'll discuss later. The outermost `namespace` call must be an absolute URI and can be given also a namespace vocabulary term instead of a string, while the nested namespaces just define a fragment string which will be concatenated to parent namespace. 
+A Grax id spec module first has to `use Grax.Id.Spec` to make the necessary macros available. With that, you can start to lay out the structure of the namespace the identifiers with the `namespace/1` macro. It takes a string with a fragment of a URI and a `do` block which consists of nested `namespace` calls or definitions of id schemas, which we'll discuss later. The outermost `namespace` call must be an absolute URI and can be given also a namespace vocabulary term instead of a string, while the nested namespaces just define a fragment string which will be concatenated to the parent namespace. 
 
 ```elixir
 defmodule Example.IdSpec do
@@ -113,7 +113,7 @@ defmodule Example.IdSpec do
 end
 ```
 
-For cases, where template consists solely of a template parameter with a property from the schema, an even shorter form is supported by the `id` macro, where the property is written in the typical dot syntax after the schema. In our book example however, we don't have this simple template form, but we can get it simple into that form, by introducing a separate sub namespace, which might have been a good idea in the first place, since it allows us to define a prefix for this namespace. 
+For cases, where the template consists solely of a template parameter with a property from the schema, an even shorter form is supported by the `id` macro, where the property is written in the typical dot syntax after the schema. In our book example however, we don't have this simple template form, but we can get it simple into that form, by introducing a separate sub namespace, which might have been a good idea in the first place, since it allows us to define a prefix for this namespace. 
 
 ```elixir
 defmodule Example.IdSpec do
@@ -191,7 +191,7 @@ end
 However, this won't be needed most of the time, since an application will usually have just one id spec for all Grax schemas. This id spec module can be configured with the `:grax_id_spec` key under the configuration of your application. So, for an application with the name `:my_app` this configuration would look like this:
 
 ```elixir
-use Mix.Config
+import Config
 
 config :my_app,
   grax_id_spec: Example.IdSpec
@@ -199,7 +199,7 @@ config :my_app,
 
 For all Grax schemas defined in the `:my_app` application the id spec module specified like this will be search for an id schema (unless another id spec module is specified directly with `id_spec` keyword directly in the Grax schema).
 
-For an id schema which directly specifies the Grax schema(s) on which it should be applied, finding the id spec is everything that's needed. The id schema with the matching Grax schema must be simply looked up. On a `build` call the Grax schema is directly available (either the one passed to `Grax.build/2` or the module on which we call the `build/1` function). When the id generation is used to build nested Grax schemas the schema specified as the type of the link property is used for the lookup. For heterogenous properties however the schema is not determined, therefore the automatic building of nested Grax schemas is not supported on heterogenous links and you'll have to build and create the identifier for these manually. 
+For an id schema which directly specifies the Grax schema(s) on which it should be applied, finding the id spec is everything that's needed. The id schema with the matching Grax schema must be simply looked up. On a `build` call the Grax schema is directly available (either the one passed to `Grax.build/2` or the module on which we call the `build/1` function). When the id generation is used to build nested Grax schemas the schema specified as the type of the link property is used for the lookup. For polymorphic properties however the schema is not determined, therefore the automatic building of nested Grax schemas is not supported on polymorphic links and you'll have to build and create the identifier for these manually. 
 
 
 ### Custom schema selectors
@@ -502,6 +502,7 @@ Grax id schemas for URN identifiers can be defined by using any of the macros fo
 ```elixir
 defmodule UrnIds do
   use Grax.Id.Spec
+  import Grax.Id.{UUID, Hash}
 
   urn :example do
     id User, "{name}"
