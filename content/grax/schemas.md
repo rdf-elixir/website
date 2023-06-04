@@ -259,9 +259,9 @@ Generally, if a `:type` is defined, the `:default` value must match this datatyp
 
 Now, back to our two kinds of properties, we'll see how link properties are mapped to other Grax schemas. 
 
-Link properties, in the following sometimes called more shortly links, are the edges of an RDF graph between the inner nodes with URIs or blank nodes, as opposed to data properties which are the edges to leaf nodes with RDF literals. Other than for data properties, the actual value of a link property with a node identifier like an URI or a blank node is not of interest, but it's the description of the thing the identifier refers to. So, the values of link properties are not the URIs or blank nodes in the object position of an RDF statement, but another Grax schema with the properties from the RDF description of the linked resource.
+Link properties, in the following sometimes called more shortly links, are the edges of an RDF graph between the inner nodes with URIs or blank nodes, as opposed to data properties which are the edges to leaf nodes with RDF literals. Other than for data properties, the actual value of a link property with a node identifier is not of primary interest, but it's the description of the thing the identifier refers to. So, the values of link properties are not the URIs or blank nodes in the object position of an RDF statement, but another Grax schema with the properties from the RDF description of the linked resource.
 
-Just like relational associations are in Ecto mapped to the struct fields through another Ecto schema for the associated table, the linked resources of a root resource are embedded into the struct in the respective field, where the properties of the linked resource are kept, potentially linking to other resources. So, the links allow us to traverse the nodes of a graph, as a tree structure down from a root resource and its fields of nested `Grax.Schema` structs.
+Just like the relational associations in Ecto are mapped to the struct fields through another Ecto schema for the associated table, the linked resources of a root resource are embedded into the struct in the respective field, where the properties of the linked resource are kept, potentially linking to other resources. So, the links allow us to traverse the nodes of a graph, as a tree structure down from a root resource and its fields of nested `Grax.Schema` structs.
 
 A Grax link can be defined in a Grax `schema` definition with another macro specifically for link properties: the `link/3` macro. 
 It has almost the same interface as the `property/3` macro. The first two arguments are again for the name and IRI of the property.
@@ -326,8 +326,8 @@ So, our `User` struct now looks like this:
 }
 ```
 
-While you have to deal in Ecto with the relational data model with different types of associations and mappings in the relational data model (1-to-1, 1-to-n, n-to-m, with an implicit or explicit join-schema etc.), the graph data model just has edges with different kinds of cardinalities, which are in Grax mapped to either single values or a list of multiple values, just like data properties, only that it's now just single or multiple schema structs for the linked nodes.
-Just as for data properties single linked schema structs are assumed unless it is list type is set on the  `:type` keyword with the `list_of` function and the module name of the schema. 
+While you have to deal in Ecto with the relational data model with different types of associations and mappings in the relational data model (1-to-1, 1-to-n, n-to-m, with an implicit or explicit join-schema etc.), the graph data model just has edges with different kinds of cardinalities, which are in Grax mapped to either single values or a list of multiple values, just like data properties, only that it's now single or multiple schema structs for the linked nodes.
+Just as for data properties single linked schema structs are assumed unless the list type is set on the  `:type` keyword with the `list_of` function and the module name of the schema. 
 
 ```elixir
 defmodule User do
@@ -403,7 +403,7 @@ end
 ```
 
 
-The default value for `:depth` is `1`. This means all of the data and object properties are loaded, including the nested `Grax.Schema` mapping with the descriptions of a linked resource, BUT NOT the linked `Grax.Schema` structs of these nested `Grax.Schema` structs. These would only be preloaded if the depth was one more and so on. So, without a further specification of the preloading depth with the `:depth` keyword, our `User` struct would look like this.
+The default value for `:depth` is `1`. This means all of the data and object properties are loaded, including the nested `Grax.Schema` mapping with the descriptions of a linked resource, BUT NOT the linked `Grax.Schema` structs of these nested `Grax.Schema` structs. These would only be preloaded if the depth was larger than one. So, without a further specification of the preloading depth, our `User` struct would look like this:
 
 ```elixir{10}
 %User{
@@ -420,7 +420,7 @@ The default value for `:depth` is `1`. This means all of the data and object pro
 }
 ```
 
-When loading a `Grax.Schema` struct the fields for the links which are not loaded just have their node identifier as a value.
+When loading a `Grax.Schema` struct, the fields for the links which are not loaded just have their node identifier as a value.
 If you've got a `Grax.Schema` struct with `RDF.IRI`s or `RDF.BlankNode`s like this on the link field and want to access the referenced recource, you'll have to do an explicit call of the `Grax.preload/3` function described in the next chapter about the API.
 
 But to ensure a proper processing of the Grax schema structs, which might expect certain fields in deeper layers of the struct, you don't want to check for these values and have to do a manual preload. In cases like this, you can enforce the depth of the preloading with the `:depth` keyword. This can be achieved in multiple ways.
@@ -512,7 +512,7 @@ defmodule Address do
 end
 ```
 
-If all link properties of schema should have the same preloading depth, the `:depth` keyword can also be specified on the `use Graph.Schema` call.
+If all link properties of a schema should have the same preloading depth, the `:depth` keyword can also be specified on the `use Graph.Schema` call.
 
 ```elixir{11,16,24}
 defmodule User do
@@ -581,46 +581,6 @@ defmodule Post do
   end
 end
 ```
-
-
-### Heterogeneous property links
-
-Links can also link different types of resources to different schemas. For this, the `:type` of a link property must be given as a map of class URIs to Grax schemas. 
-
-```elixir
-defmodule User do
-  use Grax.Schema
-
-  alias NS.{SchemaOrg, FOAF}
-
-  schema do
-    property name: SchemaOrg.name, type: :string, required: true
-    property emails: SchemaOrg.email, type: list_of(:string), required: true
-    property age: FOAF.age, type: :integer
-    
-    link friends: FOAF.friend, type: list_of(User)
-    link posts: -SchemaOrg.author, type: list_of(%{
-        SchemaOrg.BlogPosting => Post,
-        SchemaOrg.Comment => Comment
-      })
-  end
-end
-
-defmodule Comment do
-  use Grax.Schema
-
-  alias NS.SchemaOrg
-
-  schema do
-    property content: SchemaOrg.text(), type: :string
-
-    link author: SchemaOrg.author(), type: User
-  end
-end
-```
-
-So, depending on the `rdf:type` of the resource linked with a property the specified schema is used. When a linked resource doesn't have any of the specified types, the resource is ignored by default. You can change this behaviour and get an error in this case, by setting the `:on_type_mismatch` option to `:error`. Another way to deal with this situation is to provide a fallback in the type-schema mapping where  `nil` is used as the key instead of a class URI. The schema associated with `nil` will then be used when none of the other class URI matches an `rdf:type`. When multiple classes of a linked resource are matching, you'll always get an error.
-
 
 ## Cardinalities
 
@@ -707,12 +667,34 @@ defmodule Address do
 end
 ```
 
-For now, the only effect of a class declaration is that the mapping to RDF graphs will produce a `rdf:type` statement accordingly. In particular it doesn't mean that the RDF description of a resource must include a respective `rdf:type` to be loadable into a `Grax.Schema` struct.
+Such a class declaration has the following effects:
+
+- When mapping a schema struct to RDF graphs, the existence of a class declaration leads to the production of a `rdf:type` statement accordingly. 
+- The class declaration also plays a role in regards to link polymorphism, which is discussed below.
+
+By default, the RDF description of a resource doesn't have to include a respective `rdf:type` to be loadable into a `Grax.Schema` struct. 
+The behaviour what should happen with resources whose `rdf:type` doesn't match the declared class of the linked schema, however, can be configured with the `:on_rdf_type_mismatch` keyword option on a `link` definition and supports the following values:
+
+- `:force` (default value): use the linked schema anyway
+- `:ignore`: ignore these resources
+- `:error`: returns an error when such resources are encountered
+
+::: warning
+
+When considering the `:ignore` and `:error` option, you should be aware that Grax has no RDFS reasoning capabilities, which limits their usage to the following scenarios:
+
+- The `rdf:type` of the data of interest always includes all relevant classes, e.g. because the inferable classes are materialized.
+- A complete mapping of the class inheritance hierarchy on Grax schemas is available, so we can rely on the schema inheritance awareness discussed in the next section.
+
+:::
 
 
 ## Schema inheritance
 
-It is possible to derive a schema from an existing one, inheriting all of its defined properties.
+It is possible to derive a schema from an existing one. This has two effects: 
+
+- All of the defined properties of the parent schema are inherited to the child schema.
+- The child schemas can be used as values of links with the parent schema as their type. This works also during preloading, provided that a corresponding class declaration is defined for the schema.
 
 ```elixir
 defmodule Customer do
@@ -744,11 +726,87 @@ defmodule Customer do
 end
 ```
 
-Multiple inheritance is also supported by providing the schemas in a list.
+Multiple inheritance is also supported by providing the inherited schemas in a list.
 
 Note, that the class must not necessarily be a subclass of the class of the inherited schema, although this might be the case often times.
 
 If some of the inherited properties should be redefined with other characteristics, this can be done without any restrictions. They can have a different type or map to a completely different RDF property, although this might be confusing.
+
+
+
+## Link polymorphism
+
+By default, all links behave polymorphic, which means not only the Grax schema specified on the `:type` of the link is allowed, but also inherited schemas. During preloading the class declaration is taken into account also, meaning that, after searching for all schemas matching the `rdf:type`s according to the class declarations, the most specific schema inherited from the schema on the `:type` of the link is selected.
+If you don't want to deal with schemas of different types as values of a property, you can also disable this behaviour by setting the `:polymorphic` keyword option to `false`.
+
+```elixir
+defmodule Customer do
+  use Grax.Schema
+
+  alias NS.EX
+
+  schema inherit: User do
+    property since: EX.customerSince, type: :date
+    
+    link subscription: EX.subscribed, type: Subscription, polymorphic: false
+  end
+end
+```
+
+This still means that on preloading, resources from subclasses are recognized as a valid type and don't lead to an error when `:on_rdf_type_mismatch` is set to `:error`, it only means you'll always get the same schema, independent of any actual `rdf:type`s.
+
+::: warning
+
+Note again, that Grax itself has no understanding of RDFS. The aforementioned recognition of inherited RDFS classes is only possible for classes which are associated with a schema and this schema is inherited from the schema specified as the preloaded links `:type`. This unawareness of RDFS is the reason why Grax defaults to `on_rdf_type_mismatch: :force`.
+
+:::
+
+
+## Union links
+
+Links can also link different types of resources to different schemas. For this, the `:type` of a link property must be given as a map of class URIs to Grax schemas. 
+
+```elixir
+defmodule User do
+  use Grax.Schema
+
+  alias NS.{SchemaOrg, FOAF}
+
+  schema do
+    property name: SchemaOrg.name, type: :string, required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
+    property age: FOAF.age, type: :integer
+    
+    link friends: FOAF.friend, type: list_of(User)
+    link posts: -SchemaOrg.author, type: list_of(%{
+        SchemaOrg.BlogPosting => Post,
+        SchemaOrg.Comment => Comment
+      })
+  end
+end
+
+defmodule Comment do
+  use Grax.Schema
+
+  alias NS.SchemaOrg
+
+  schema do
+    property content: SchemaOrg.text(), type: :string
+
+    link author: SchemaOrg.author(), type: User
+  end
+end
+```
+
+So, depending on the `rdf:type` of the resource linked with a property, the specified schema is used. Other than for normal links, when a linked resource doesn't have any of the specified types, the resource is ignored by default, because `:on_rdf_type_mismatch` defaults to `:ignore` on union links. The reason for this is that union links do not have a unique scheme that could be enforced, so the `:force` option cannot be provided here. However, an equivalent behavior can be defined by providing a fallback in the type-schema mapping where `nil` is used as the key instead of a class URI. The schema associated with `nil` will then be used when none of the other class URI matches an `rdf:type`. When multiple classes of a linked resource are matching, you'll always get an error. You can also enforce an error in case with no matching `rdf:type`, by setting the `:on_rdf_type_mismatch` option to `:error`. 
+
+::: danger
+
+Inheritance awareness on union links is currently limited to the schemas within the schema. That means when schemas are in the union which are in an inheritance relation, the most specific schema according to the `rdf:type` will be selected during preloading. However, no schemas outside the union will be allowed, even when they are inherited from schemas within the union. 
+
+A workaround for cases when you want a polymorphic property which supports multiple schemas is to define a helper schema which is derived from all the schemas you would have used in the union and use this helper schema instead of the union.
+
+:::
 
 
 ## Custom fields

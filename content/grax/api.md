@@ -76,19 +76,24 @@ end
 
 ## Loading from RDF graphs
 
-You can load a `Grax.Schema` struct from the description in an RDF graph with the `Grax.load/3` function, which expects 
+You can load a `Grax.Schema` struct from the description in an RDF graph with the `Grax.load/4` function, which expects 
 
-1. the `Grax.Schema` struct module, 
-2. the identifier of the resource to be loaded and 
-3. a `RDF.Graph` with a description of this resource.
+1. an `RDF.Graph` with a description of this resource,
+2. the identifier of the resource to be loaded,
+3. the `Grax.Schema` struct module and
+4. optional arguments
 
 ```elixir
-iex> Grax.load(User, EX.User1, graph)
+iex> Grax.load(graph, EX.User1, User)
 {:ok,
  %User{
    __id__: ~I<http://example.com/User1>,
-   __additional_statements__: %{},
-   age: nil,
+   __additional_statements__: %{
+     ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+       ~I<https://schema.org/Person> => nil
+     }
+   },
+   age: 30,
    customer_type: :premium_user,
    email: ["jane@example.com", "jane@work.com"],
    friends: [],
@@ -97,6 +102,7 @@ iex> Grax.load(User, EX.User1, graph)
    posts: [
      %Post{
        __id__: ~I<http://example.com/Post1>,
+       _additional_statements__: %{},
        author: ~I<http://example.com/User1>,
        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident, nihil, dignissimos. Nesciunt aut totam eius. Magnam quaerat modi vel sed, ipsam atque rem, eos vero ducimus beatae harum explicabo labore!",
        title: "Lorem"
@@ -105,13 +111,19 @@ iex> Grax.load(User, EX.User1, graph)
  }}
 ```
 
-Unlike most of the other functions working on existing `Grax.Schema` structs, you have to provide the `Grax.Schema` module explicitly. For this reason, the `Grax.Schema` modules provide a dedicated `load/2` function on which the order of the resource identifier and the graph arguments is swapped for better pipeline support. So, the following function call is equivalent to the previous call:
+The `Grax.Schema` modules also provide a dedicated `load/3` function on which the schema is implicit. So, the following function call is equivalent to the previous call:
 
 ```elixir
 graph |> User.load(EX.User1)
 ```
 
-There are also bang variants of the both the general `Grax.load/3` and the dedicated `load/2` functions on the struct modules available, which return the result directly and fail in error cases as usual. But there's another difference between these `load` variants. The non-bang variant by default performs validations of the data against the schema (described further below), while the non-bang variant does not perform this validation step by default. However, you can control this validation step with the optional `:validate` option flag independently. Except for the different return type, the `load` variants just differ in the default value of this `:validate` option. 
+It is also possible to omit the schema on the general `Grax.load/3` function. In this case Grax trys to automatically detect the schema based on the `rdf:type` of the loaded resource. That means the most specific schema with a class declaration matching one of the `rdf:type`s will be selected. So, since our `User` schema is associated with the Schema.org class used in our example data, we can also load this resource with:
+
+```elixir
+graph |> Grax.load(EX.User1)
+```
+
+There are also bang variants of the both the general `Grax.load/4` and the dedicated `load/3` functions on the struct modules available, which return the result directly and fail in error cases as usual. But there's another difference between these `load` variants. The non-bang variant by default performs validations of the data against the schema (described further below), while the non-bang variant does not perform this validation step by default. However, you can control this validation step with the optional `:validate` option flag independently. Except for the different return type, the `load` variants just differ in the default value of this `:validate` option. 
 
 ::: tip
 
@@ -130,7 +142,12 @@ iex> User.load(graph, EX.User1, depth: 2)
 {:ok,
  %User{
    __id__: ~I<http://example.com/User1>,
-   age: nil,
+      __additional_statements__: %{
+     ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+       ~I<https://schema.org/Person> => nil
+     }
+   },
+   age: 30,
    customer_type: :premium_user,
    email: ["jane@example.com", "jane@work.com"],
    friends: [],
@@ -139,9 +156,15 @@ iex> User.load(graph, EX.User1, depth: 2)
    posts: [
      %Post{
        __id__: ~I<http://example.com/Post1>,
+       __additional_statements__: %{},
        author: %User{
          __id__: ~I<http://example.com/User1>,
-         age: nil,
+         __additional_statements__: %{
+           ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+             ~I<https://schema.org/Person> => nil
+           }
+         },
+         age: 30,
          customer_type: :premium_user,
          email: ["jane@example.com", "jane@work.com"],
          friends: [],
@@ -181,7 +204,12 @@ You can do a manual preload with the `Grax.preload/3` function.
 iex> user = User.load!(graph, EX.User1)
 %User{
   __id__: ~I<http://example.com/User1>,
-  age: nil,
+  __additional_statements__: %{
+    ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+      ~I<https://schema.org/Person> => nil
+    }
+  },
+  age: 30,
   customer_type: :premium_user,
   email: ["jane@example.com", "jane@work.com"],
   friends: [],
@@ -190,6 +218,7 @@ iex> user = User.load!(graph, EX.User1)
   posts: [
     %Post{
       __id__: ~I<http://example.com/Post1>,
+      __additional_statements__: %{},
       author: ~I<http://example.com/User1>,
       content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident, nihil, dignissimos. Nesciunt aut totam eius. Magnam quaerat modi vel sed, ipsam atque rem, eos vero ducimus beatae harum explicabo labore!",
       title: "Lorem"
@@ -201,7 +230,12 @@ iex(4)> Grax.preload(user, graph, depth: 2)
 {:ok,
  %User{
    __id__: ~I<http://example.com/User1>,
-   age: nil,
+   __additional_statements__: %{
+     ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+       ~I<https://schema.org/Person> => nil
+     }
+   },
+   age: 30,
    customer_type: :premium_user,
    email: ["jane@example.com", "jane@work.com"],
    friends: [],
@@ -210,15 +244,20 @@ iex(4)> Grax.preload(user, graph, depth: 2)
    posts: [
      %Post{
        __id__: ~I<http://example.com/Post1>,
+       __additional_statements__: %{},
        author: %Example.User{
          __id__: ~I<http://example.com/User1>,
-         age: nil,
-         comments: #Grax.Link.NotLoaded<link :comments is not loaded>,
+         __additional_statements__: %{
+           ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+             ~I<https://schema.org/Person> => nil
+           }
+         },
+         age: 30,
          customer_type: :premium_user,
          email: ["jane@example.com", "jane@work.com"],
          name: "Jane",
          password: nil,
-         posts: #Grax.Link.NotLoaded<link :posts is not loaded>
+         posts: [~I<http://example.com/Post1>],
        },
        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident, nihil, dignissimos. Nesciunt aut totam eius. Magnam quaerat modi vel sed, ipsam atque rem, eos vero ducimus beatae harum explicabo labore!",
        title: "Lorem"
@@ -238,6 +277,11 @@ When an RDF description of a resource does not exist yet, but should be created 
 iex> User.build!(EX.User2)
 %User{
   __id__: ~I<http://example.com/ex>,
+  __additional_statements__: %{
+    ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+      ~I<https://schema.org/Person> => nil
+    }
+  },
   age: nil,
   customer_type: nil,
   email: [],
@@ -257,10 +301,15 @@ iex> user = User.build!(EX.User2,
 ...>   password: "secret")
  %User{
   __id__: ~I<http://example.com/User2>,
+  __additional_statements__: %{
+    ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+      ~I<https://schema.org/Person> => nil
+    }
+  },
   age: nil,
   customer_type: nil,
   email: ["john@example.com"],
-  friends: #Grax.Link.NotLoaded<link :friends is not loaded>,
+  friends: [],
   name: "John",
   password: "secret",
   posts: []
@@ -279,6 +328,11 @@ iex> Grax.put(user, :age, 42)
 {:ok,
  %User{
    __id__: ~I<http://example.com/User2>,
+   __additional_statements__: %{
+     ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+       ~I<https://schema.org/Person> => nil
+     }
+   },
    age: 42,
    customer_type: nil,
    email: ["john@example.com"],
@@ -309,6 +363,11 @@ The non-bang variant doesn't perform validations. But even without that, you sho
 iex> Grax.put!(user, :email, "john@doe.com")
 %User{
   __id__: ~I<http://example.com/User2>,
+   __additional_statements__: %{
+     ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+       ~I<https://schema.org/Person> => nil
+     }
+   },
   age: 42,
   customer_type: nil,
   email: ["john@doe.com"],
@@ -325,6 +384,11 @@ Nested structs can be set by providing a `Grax.Schema` struct accordingly.
 iex> Grax.put!(user, :posts, Post.build!(EX.Post2, title: "Foo"))
 %User{
   __id__: ~I<http://example.com/User2>,
+  __additional_statements__: %{
+    ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+      ~I<https://schema.org/Person> => nil
+    }
+  },
   age: 42,
   customer_type: nil,
   email: ["john@example.com"],
@@ -334,6 +398,7 @@ iex> Grax.put!(user, :posts, Post.build!(EX.Post2, title: "Foo"))
   posts: [
     %Post{
       __id__: ~I<http://example.com/Post2>,
+      __additional_statements__: %{},
       author: nil,
       content: nil,
       title: "Foo"
@@ -348,6 +413,11 @@ You can also provide the properties and the values of a nested struct as a map. 
 iex> Grax.put!(user, :posts, %{__id__: EX.Post2, title: "Foo"})
 %User{
   __id__: ~I<http://example.com/User2>,
+  __additional_statements__: %{
+    ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+      ~I<https://schema.org/Person> => nil
+    }
+  },
   age: 42,
   customer_type: nil,
   email: ["john@example.com"],
@@ -357,6 +427,7 @@ iex> Grax.put!(user, :posts, %{__id__: EX.Post2, title: "Foo"})
   posts: [
     %Post{
       __id__: ~I<http://example.com/Post2>,
+      __additional_statements__: %{},
       author: nil,
       content: nil,
       title: "Foo"
@@ -371,6 +442,11 @@ It is also possible to put just the node identifier of a linked resource as a `R
 iex> Grax.put!(user, :posts, EX.Post2)
 %User{
   __id__: ~I<http://example.com/User2>,
+  __additional_statements__: %{
+    ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+      ~I<https://schema.org/Person> => nil
+    }
+  },
   age: 42,
   customer_type: nil,
   email: ["john@example.com"],
@@ -389,6 +465,11 @@ iex> Grax.build!(user,
 ...>   age: user.age + 1)
 %User{
   __id__: ~I<http://example.com/User2>,
+  __additional_statements__: %{
+    ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+      ~I<https://schema.org/Person> => nil
+    }
+  },
   age: 43,
   customer_type: nil,
   email: ["john@doe.com", "john@example.com"],
@@ -496,10 +577,14 @@ iex> user = User.load!(graph, EX.User1)
 %User{
   __id__: ~I<http://example.com/User1>,
   __additional_statements__: %{
-    ~I<http://www.w3.org/2000/01/rdf-schema#comment> => 
-       #MapSet<[~L"a comment about our example user resource"]>
+    ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+      ~I<https://schema.org/Person> => nil
+    },
+    ~I<http://www.w3.org/2000/01/rdf-schema#comment> => %{
+      ~L"a comment about our example user resource" => nil
+    }
   },
-  age: nil,
+  age: 30,
   customer_type: :premium_user,
   email: ["jane@example.com", "jane@work.com"],
   friends: [],
@@ -508,6 +593,7 @@ iex> user = User.load!(graph, EX.User1)
   posts: [
     %Post{
       __id__: ~I<http://example.com/Post1>,
+      __additional_statements__: %{},
       author: ~I<http://example.com/User1>,
       content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident, nihil, dignissimos. Nesciunt aut totam eius. Magnam quaerat modi vel sed, ipsam atque rem, eos vero ducimus beatae harum explicabo labore!",
      title: "Lorem"
@@ -516,24 +602,87 @@ iex> user = User.load!(graph, EX.User1)
 }
 ```
 
+Due to the class declaration we have on our `User` schema, a respective `rdf:type` statement is also included.
+
 Since all of the properties of importance for your application usually are defined on a `Grax.Schema`, you usually don't care for the contents of this map. 
-However, if you want to access the additional statements, you can do so with the `Grax.additional_statements/1`,  `Grax.add_additional_statements/2`,  `Grax.put_additional_statements/2`,  `Grax.delete_additional_statements/2` and `Grax.clear_additional_statements/1` functions.
+However, if you want to access the additional statements, you can do so with the `Grax.additional_statements/1`,  `Grax.add_additional_statements/2`,  `Grax.put_additional_statements/2`,  `Grax.delete_additional_statements/2`, `Grax.delete_additional_predicates/2` and `Grax.clear_additional_statements/1` functions.
 
 ```elixir
 iex> Grax.add_additional_statements(user, %{RDFS.comment() => "another comment"})
-..> |> Grax.additional_statements()
-#RDF.Description<
+...> |> Grax.additional_statements()
+#RDF.Description<subject: ~I<http://example.com/User1>
   <http://example.com/User1>
+      a <https://schema.org/Person> ;
       rdfs:comment "a comment about our example user resource", "another comment" .
 >
 ```
 
-::: tip
-
-The `Grax.delete_additional_statements/2` functions deletes only the explicitly given predicate-object pairs. If you want to delete all statements with a given predicate, you can use `Grax.put_additional_statements/2` and providing `nil` as the object value.
+The `Grax.delete_additional_statements/2` functions deletes only the explicitly given predicate-object pairs. If you want to delete all statements with a given predicate, you can use `Grax.delete_additional_predicates/2`.
 
 ```elixir
-`Grax.put_additional_statements(user, %{RDFS.comment() => nil})
+Grax.delete_additional_predicates(user, [RDFS.comment()])
 ```
 
-:::
+
+## Mapping between schemas
+
+Sometimes you have multiple schemas for the same kind of resource, e.g. different domain models for the same entity in different parts of your app. The `from/1` function on every Grax schema module allows you to load a Grax schema struct from another kind of Grax schema struct. The property values are then fetched from the property fields for the respective IRIs (and a potionally different name) or the additional statements.
+
+Let's say, for example, we have this additional Grax schema for customers besides the `User` model in our app:
+
+```elixir
+defmodule Customer do
+  use Grax.Schema
+
+  alias NS.SchemaOrg
+
+  schema SchemaOrg.Person do
+    property full_name: SchemaOrg.name, type: :string, required: true
+    property email: SchemaOrg.email, type: :string, required: true
+    property address: SchemaOrg.address, type: :string, required: true
+  end
+end
+```
+
+With a `user` like this:
+
+```elixir
+user =
+  """
+  @prefix : <http://example.com/> .
+  @prefix schema: <https://schema.org/> .
+  @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+  :User1
+      a schema:Person, :PremiumUser ;
+      schema:name "John Doe" ;
+      schema:email "john@example.com" ;
+      schema:address "711-2880 Nulla St.\\nMankato Mississippi 96522" ;
+      foaf:age 30 .
+  """
+  |> RDF.Turtle.read_string!()
+  |> User.load!(EX.User1)
+```
+
+we can could get a `Customer` struct like this:
+
+```elixir
+iex> Customer.from(user)
+{:ok,
+ %Customer{
+   __additional_statements__: %{
+     ~I<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> => %{
+       ~I<http://example.com/PremiumUser> => nil,
+       ~I<https://schema.org/Person> => nil
+     },
+     ~I<http://xmlns.com/foaf/0.1/age> => %{RDF.XSD.Integer.new(30) => nil}
+   },
+   __id__: ~I<http://example.com/User1>,
+   address: "711-2880 Nulla St.\nMankato Mississippi 96522",
+   email: "john@example.com",
+   full_name: "John Doe"
+ }}
+```
+
+Internally, this is done with a RDF mapping roundtrip via `to_rdf/1` and `load/2`, which means you can use [custom mappings](schemas.html#custom-mappings) for your custom mapping logic.
+
