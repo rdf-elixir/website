@@ -845,7 +845,7 @@ One approach is to define your own custom mapping functions for individual prope
 
 A `from_rdf` function must accept three arguments:
 
-1. The first argument is the list of the actual RDF values for the property for which the custom mapping was called.
+1. The first argument is the list of the actual RDF values for the property for which the custom mapping was called. Note, that the function is only called when values for the property are present in the data.
 2. The second argument is the `RDF.Description` of the mapped resource, which can be used when the mapping depends on other properties of the resource description.
 3. The third argument is whole `RDF.Graph` from which the mapping is called, which can be used when the mapping depends on other statements of the graph.
 
