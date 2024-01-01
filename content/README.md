@@ -16,7 +16,7 @@ features:
   details: >-
     A light-weight graph data mapper which maps RDF graph data from RDF.ex data structures to schema-conform Elixir structs for the domain models of an RDF-based application.
 footer: >-
-    MIT Licensed | © 2016-2023 Marcel Otto
+    MIT Licensed | © 2016-2024 Marcel Otto
     
 ---
 
