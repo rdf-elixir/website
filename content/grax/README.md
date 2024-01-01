@@ -2,11 +2,9 @@
 
 Grax is a light-weight graph data mapper which maps RDF graph data from [RDF.ex](/rdf-ex/) data structures to schema-conform Elixir structs.
 
-This is an early version with a limited scope.  It currently maps only from and to [RDF.ex](/rdf-ex/) graphs and even that in the most basic way. 
+Grax has a very limited scope at the moment. It currently maps only from and to [RDF.ex](/rdf-ex/) graphs and even that in the most basic way. 
 You'll have to use [RDF.ex serializers](/rdf-ex/serializations) or the [SPARQL.Client](/sparql-client/) to get the RDF.ex graph on your own.
 No SPARQL-query builders. 
-(Almost) No RDFS-support.
-But within that limited scope, it should be functional already. 
 
 This guide is split into two parts:
 
