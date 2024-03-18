@@ -266,7 +266,9 @@ iex> RDF.Graph.put_properties(graph, %{EX.S => %{p1: EX.New}}, context: %{p1: EX
 >
 ```
 
-As mentioned in the last section, When the subject of a statement doesn't match the subject of a description, `RDF.Description.add/3` ignores it and is a no-op, but when given a `RDF.Description` to add it ignores its subject and just adds its property-value pairs, because this is a common use case when merging the descriptions of differently named resources.
+For adding a graph to a `RDF.Dataset` overwriting a previous graph, the `RDF.Dataset.put_graph/3 ` function can be used.
+
+As mentioned in the last section, when the subject of a statement doesn't match the subject of a description, `RDF.Description.add/3` ignores it and is a no-op. However, when given a `RDF.Description` to add, it ignores its subject and just adds its property-value pairs, because this is a common use case when merging the descriptions of differently named resources.
 
 ```elixir
 iex> description = RDF.description(EX.S, init: {EX.p, EX.O1})
@@ -311,7 +313,6 @@ As most of the functions of `RDF.Dataset` the functions for adding statements ha
 
 1. When called with a graph name via the `:graph` option, the function call is essentially delegated to the respective graph and the implementation of this function on `RDF.Graph`, which might even mean that input data from different graphs (eg. quads or `RDF.Graph`s with different graph names) becomes aggregated and get redirected to the specified graph.
 2. Without a `:graph` option the all quads or `RDF.Graph`s in the input are directed to respective graphs.
-
 
 ```elixir
 iex> dataset = RDF.dataset([
@@ -359,7 +360,6 @@ iex> RDF.Dataset.add(dataset, [
 >]
 ```
 
-
 Unlike the `add` function, which always returns the same data structure as the data structure to which the addition happens, which possible means ignoring some input statements (eg. when the subject of a statement doesn't match the description subject) or reinterpreting some parts of the input statement (eg. ignoring the subject of another description), the `merge` function of the `RDF.Data` protocol implemented by all three data structures will always add all of the input statements and possibly creates another type of data structure. For example, merging two `RDF.Description`s with different subjects results in a `RDF.Graph` or adding a quad to a `RDF.Graph` with a different name than the quad’s graph context results in a `RDF.Dataset`.
 
 ```elixir
@@ -372,6 +372,7 @@ Finally, the `update/4` functions allows updating of specified elements in the R
 
 - `RDF.Description.update/4` updates the objects of the given predicate with the results of the update function which receives the previous objects and can either return a single or multiple new objects to be set or `nil` if all statements with this predicate should be deleted.
 - `RDF.Graph.update/4` updates the description of the given subject with the results of the update function which receives the previous `RDF.Description` and can either return all supported input formats for `RDF.Description`s or `nil` if the description should be deleted.
+- `RDF.Dataset.update/4` updates the graph of the given name with the results of the update function which receives the previous `RDF.Graph` and can either return all supported input formats for `RDF.Graph`s or `nil` if the graph should be deleted.
 
 ```elixir
 iex> RDF.description(EX.S, init: {EX.p, 42})
@@ -615,9 +616,25 @@ iex> RDF.Description.new(EX.S1, init: {EX.p, [EX.O1, EX.O2]})
 Beyond that, there are:
 
 - `RDF.Description.delete_predicates/2` which deletes all statements with the given property from a `RDF.Description`,
+- `RDF.Graph.delete_predications/2` which deletes all statements with the given subject and predicate from a `RDF.Graph`,
 - `RDF.Graph.delete_subjects/2` which deletes all statements with the given subject resource from a `RDF.Graph`,
 - `RDF.Dataset.delete_graph/2` which deletes all graphs with the given graph name from a `RDF.Dataset` and
 - `RDF.Dataset.delete_default_graph/1` which deletes the default graph of a `RDF.Dataset`.
+
+The `intersection/2` function of `RDF.Description`, `RDF.Graph` and `RDF.Dataset` can be used create a graph intersection. The first argument must match the base data structure, while the RDF data on second argument can be given in any form a `RDF.Graph` resp. `RDF.Dataset` can constructed from.
+
+```elixir
+iex> RDF.Graph.new({EX.S1, EX.p(), [EX.O1, EX.O2]})
+...> |> RDF.Graph.intersection({EX.S1, EX.p(), [EX.O2, EX.O3]})
+#RDF.Graph<name: nil
+  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+  @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+  @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+  <http://example.com/S1>
+      <http://example.com/p> <http://example.com/O2> .
+>
+```
 
 
 ## Equality
@@ -690,4 +707,17 @@ iex> RDF.Graph.new([{~B<foo>, EX.p(), ~B<bar>}, {~B<bar>, EX.p(), ~B<foo>}])
 >
 ```
 
+The functions `RDF.Graph.canonical_hash/2` and `RDF.Dataset.canonical_hash/2` can be used get a hash of the N-Quads serialization of a `RDF.Graph` resp. `RDF.Dataset` in this RDF dataset canonicalized form. 
+
+```elixir
+iex> RDF.Graph.new([{~B<foo>, EX.p(), ~B<bar>}, {~B<bar>, EX.p(), ~B<foo>}])
+...> |> RDF.Graph.canonical_hash()
+"053688e09a20a49acc3e1a5e6403c827b817eef9e4c90bfd71f2360e2a6446aa"
+
+iex> RDF.Dataset.new([{~B<foo2>, EX.p(), ~B<bar2>}, {~B<bar2>, EX.p(), ~B<foo2>}])
+...> |> RDF.Dataset.canonical_hash()
+"053688e09a20a49acc3e1a5e6403c827b817eef9e4c90bfd71f2360e2a6446aa"
+```
+
+By default SHA-256 is used for hashing, which can be changed, however, with the `:hash_algorithm` keyword option.
 
