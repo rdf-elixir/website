@@ -135,7 +135,6 @@ You might be wondering what the `RDF.BlankNode.Increment` in the child specifica
 ### UUID generator
 
 The `RDF.IRI.UUID.Generator` allows to generate various kinds of UUID-based URI identifiers. 
-This generator is only available when you have defined the [elixir_uuid](https://hex.pm/packages/elixir_uuid)package as an additional dependency in the Mixfile of your application.
 
 It supports various configuration options:
 

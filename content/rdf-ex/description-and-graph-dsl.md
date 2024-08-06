@@ -137,7 +137,7 @@ RDF.Graph.build do
 end
 ```
 
-Instead of aliasing vocabulary namespaces in the surrounding module, however, you can also declare them inside of the build block with a `@prefix` definition. This will not only create an alias for the vocabulary namespace in the build block, but adds it as a prefix to the created `RDF.Graph`. By default, it will use the downcased and underscored name of the vocabulary namespace module (resp. the last segment of its fully qualified name), but you can also define a custom prefix by providing it as the key in a keyword tuple after the `@prefix`, instead of just defining the vocabulary namespace module.
+In fact, with Elixir versions >= 1.17, aliases inside of the build block are no longer supported, i.e. don't have the desired effect. However, instead of aliasing vocabulary namespaces in the surrounding module, there is a better solution anyway: you can also declare them inside of the build block with a `@prefix` definition. This will not only create an alias for the vocabulary namespace in the build block, but adds it as a prefix to the created `RDF.Graph`. By default, it will use the downcased and underscored name of the vocabulary namespace module (resp. the last segment of its fully qualified name), but you can also define a custom prefix by providing it as the key in a keyword tuple after the `@prefix`, instead of just defining the vocabulary namespace module.
 
 ```elixir
 require RDF.Graph

@@ -1,6 +1,6 @@
 # Serializations
 
-The RDF.ex package comes with implementations of the [N-Triples](https://www.w3.org/TR/n-triples/), [N-Quads](https://www.w3.org/TR/n-quads/) and [Turtle](https://www.w3.org/TR/turtle/) serialization formats (incl. the respective RDF-star extensions). 
+The RDF.ex package comes with implementations of the [N-Triples](https://www.w3.org/TR/n-triples/), [N-Quads](https://www.w3.org/TR/n-quads/), [Turtle](https://www.w3.org/TR/turtle/) and [TriG](https://www.w3.org/TR/trig/) serialization formats (incl. the respective RDF-star extensions). 
 Formats which require additional dependencies are implemented in separate Hex packages.
 The [JSON-LD](http://www.w3.org/TR/json-ld/) format for example is available with the [JSON-LD.ex](https://hex.pm/packages/json_ld) package and the [RDF-XML](http://www.w3.org/TR/rdf-syntax-grammar/) format is available with the [RDF-XML.ex](https://hex.pm/packages/rdf_xml) package.
 
