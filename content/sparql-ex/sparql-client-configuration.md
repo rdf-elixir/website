@@ -17,7 +17,7 @@ So, for hackney you'll have to add `hackney` to `mix.exs`:
 ```elixir
 def deps do
   [
-    {:sparql_client, "~> 0.3"},
+    {:sparql_client, "~> 0.5"},
     {:hackney, "~> 1.6"}
   ]
 end
