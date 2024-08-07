@@ -548,6 +548,29 @@ But additive preloading depths can lead to infinite preloading circles. This is 
 This a pretty greedy preloading strategy. But in the first version, which is limited to working on in-memory RDF.ex graphs, where loading is quite fast and the data access doesn't require any further IO, this simple strategy gets us already quite far.
 
 
+### Preloading resources without a description
+
+What happens when we try to preload a link to a resource for which the graph we are loading from does not contain a description? By default, an empty version of the specified schema is preloaded in this case. This might be problematic
+especially when the schema of the link contains required properties. The option `:on_missing_description` option with the value `:use_rdf_node` allows to specify that preloading should be skipped in this case and the RDF node should be kept as a value instead.
+
+```elixir{12}
+defmodule User do
+  use Grax.Schema
+
+  alias NS.{SchemaOrg, FOAF}
+
+  schema do
+    property name: SchemaOrg.name, type: :string, required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
+    property age: FOAF.age, type: :integer
+    
+    link friends: FOAF.friend, type: list_of(User), 
+         on_missing_description: :use_rdf_node
+  end
+end
+```
+
+
 ### Inverse property links
 
 Sometimes we want to define a `link` on a `Grax.Schema` for which no RDF property exists directly. For example, in our data there is no property linking a user to a post directly. Instead there is the `schema:author`property which links a post to its authors, so exactly the inverse property of what we want. You can specify a link property on a `Grax.Schema` in those cases by declaring it as an inverse property with a minus sign before the IRI of the inverse property.
