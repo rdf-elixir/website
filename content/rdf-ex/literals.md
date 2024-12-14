@@ -156,6 +156,8 @@ Besides the `RDF.LangString` datatype the following XSD datatypes are provided a
 | `xsd:QName` | ❌ |
 | `xsd:NOTATION` | ❌ |
 
+RDF.ex also supports the `rdf:JSON` datatype with `RDF.JSON` which allows JSON content as literal values. Please refer to the [API documentation of `RDF.JSON`](https://hexdocs.pm/rdf/RDF.JSON.html) for details.
+
 For literals with an unknown datatype, i.e. a datatype without a `RDF.Literal.Datatype` module the generic `RDF.Literal.Generic` implementation s used. For those generic literals the  `RDF.Literal.value/1` function simply returns the initially given value unvalidated and unconverted. 
 
 ## Validation
