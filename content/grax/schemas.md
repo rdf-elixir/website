@@ -282,6 +282,50 @@ If not specified otherwise, the default value will be `nil`, just like the defau
 Generally, if a `:type` is defined, the `:default` value must match this datatype. Otherwise it won't compile.
 
 
+### JSON type
+
+The `:json` datatype allows values that are mapped to and from `rdf:JSON` literals. When using the `:json` datatype, any JSON-serializable Elixir value is allowed:
+
+- All scalar JSON values: strings, numbers, booleans 
+- Arrays as Elixir lists
+- Objects as Elixir maps with string keys
+
+```elixir
+defmodule Example do
+  use Grax.Schema
+
+  schema do
+    property config: EX.configuration(), type: :json
+  end
+end
+```
+
+This allows to map JSON data like this:
+
+```elixir
+%Example{
+  __id__: EX.S1,
+  config: %{
+    "server" => "example.com",
+    "port" => 8080,
+    "features" => ["a", "b", "c"],
+    "debug" => true,
+    "timeout" => nil
+  }
+}
+```
+
+Since Grax uses `nil` to represent the absence of a value on properties and `nil` is also the Elixir representation of JSON's `null` value, the special `:null` atom value was introduced to represent JSON `null` when it appears as a direct value of a `:json` property. Inside nested structures and lists however, where this ambiguity not exists, `nil` is used to represent JSON `null`.
+
+```elixir
+# JSON null as a property value
+%Example{config: :null}  
+
+# JSON null inside nested structures
+%Example{config: %{"foo" => nil}}
+```
+
+
 ## Link properties
 
 Now, back to our two kinds of properties, we'll see how link properties are mapped to other Grax schemas. 
