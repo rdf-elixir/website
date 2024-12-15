@@ -163,11 +163,38 @@ Both email addresses from our example can now be represented in our `User` struc
 }
 ```
 
+When using `list_of` or `list`, although values are kept in ordered lists in the Elixir structs, this order is irrelevant since the values have no particular order in RDF. You should not rely on any particular order. Similarly, as the values are essentially sets, duplicates are not allowed and will be removed automatically.
+
+If the order of elements matters in your domain model, Grax also provides support for ordered lists via `ordered_list_of` and `ordered_list`. While they behave exactly the same as their unordered counterparts in terms of definition and usage in your code, they ensure that the order of the elements is preserved when mapped to RDF by storing them in an RDF list (using `rdf:List`). Unlike unordered lists, duplicates in ordered lists will also be preserved in RDF.
+
+```elixir{9}
+defmodule User do
+  use Grax.Schema
+
+  alias NS.{SchemaOrg, FOAF}
+
+  schema do
+    property name: SchemaOrg.name, type: :string, required: true
+    property emails: SchemaOrg.email, type: list_of(:string)
+    property phones: SchemaOrg.telephone, type: ordered_list_of(:string)
+  end
+end
+```
+
 ::: warning
+RDF lists should be used with caution as they make the RDF representation significantly more complex:
 
-Although ordered lists are used for multiple values, the order is irrelevant since the values have no particular order in RDF. You should not rely on any particalur order. Similarly, as the values are essentially sets, duplicates are not allowed. They will be removed automatically.
+- They require multiple additional statements for each list element
+- They use blank nodes which make the data harder to query
+- Modifying lists requires careful handling to maintain their structure
 
+Therefore, ordered lists should only be used if there is no other way around it and you can live with the consequences this has for your data.
 :::
+
+::: warning
+When mapping ordered lists to RDF, blank nodes are used for both the list structure itself and the nodes of the list elements. These blank nodes are not stable and will be regenerated on every mapping. This means they cannot be referenced from other parts of your RDF graph. Support for stable and custom node identifiers for the list structure is planned for a future version.
+:::
+
 
 
 ## Data properties
@@ -327,7 +354,7 @@ So, our `User` struct now looks like this:
 ```
 
 While you have to deal in Ecto with the relational data model with different types of associations and mappings in the relational data model (1-to-1, 1-to-n, n-to-m, with an implicit or explicit join-schema etc.), the graph data model just has edges with different kinds of cardinalities, which are in Grax mapped to either single values or a list of multiple values, just like data properties, only that it's now single or multiple schema structs for the linked nodes.
-Just as for data properties single linked schema structs are assumed unless the list type is set on the  `:type` keyword with the `list_of` function and the module name of the schema. 
+Just as for data properties single linked schema structs are assumed unless the list type is set on the `:type` keyword with the `list_of` function (or `ordered_list_of` if the order of links should be preserved) and the module name of the schema.
 
 ```elixir
 defmodule User do
@@ -623,7 +650,7 @@ defmodule User do
 end
 ```
 
-For list properties you can specify the cardinality on the `list` resp. `list_of` type constructor functions with the `:card` option. It can have 
+For list properties you can specify the cardinality on the respective type constructor functions (`list` , `list_of`, `ordered_list` , `ordered_list_of`) with the `:card` option. It can have 
 
 - a single integer value for an exact cardinality, 
 - an Elixir range value (like `1..3`) for a cardinality with an lower and upper boundary,
