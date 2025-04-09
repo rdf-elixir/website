@@ -721,3 +721,15 @@ iex> RDF.Dataset.new([{~B<foo2>, EX.p(), ~B<bar2>}, {~B<bar2>, EX.p(), ~B<foo2>}
 
 By default SHA-256 is used for hashing, which can be changed, however, with the `:hash_algorithm` keyword option.
 
+
+::: tip
+When writing ExUnit tests involving RDF data, you can use the `assert_rdf_isomorphic/2` function to assert that two RDF graphs or datasets are isomorphic:
+
+```elixir
+assert_rdf_isomorphic actual_graph, expected_graph
+assert_rdf_isomorphic actual_dataset, expected_dataset
+assert_rdf_isomorphic actual_dataset, expected_graph
+```
+
+On failure, this assertion will display a diff of the graphs to help identify the differences.
+:::
