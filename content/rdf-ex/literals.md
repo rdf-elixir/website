@@ -161,7 +161,7 @@ For literals with an unknown datatype, i.e. a datatype without a `RDF.Literal.Da
 
 ## JSON literals
 
-RDF.ex also supports the `rdf:JSON` datatype with `RDF.JSON` which allows JSON content as literal values. Please refer to the [API documentation of `RDF.JSON`](https://hexdocs.pm/rdf/RDF.JSON.html) for details.
+RDF.ex also supports the `rdf:JSON` datatype with `RDF.JSON` which allows JSON content as literal values. 
 
 JSON literals can be created with the `RDF.JSON.new/2` constructor function or it's alias `RDF.json/1`. You can pass either a JSON string or an Elixir value (map, list, number, boolean, or nil) that will be encoded as JSON:
 
