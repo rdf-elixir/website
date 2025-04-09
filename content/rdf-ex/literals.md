@@ -167,13 +167,16 @@ JSON literals can be created with the `RDF.JSON.new/2` constructor function or i
 
 ```elixir
 # From an Elixir value
-RDF.json(%{foo: 42})
+iex> RDF.json(%{foo: 42})
+RDF.JSON.new(%{"foo" => 42})
 
 # From a JSON string
-RDF.json(~s({"foo": 42}))
+iex> RDF.json(~s({"foo": 42}))
+RDF.JSON.new("{\"foo\": 42}")
 
 # Creating a JSON string literal (rather than parsing it as JSON)
-RDF.json"null", as_value: true)
+iex> RDF.json("null", as_value: true)
+RDF.JSON.new("null")
 ```
 
 The value of a JSON literal can be accessed with the `RDF.JSON.value/2` function which returns the decoded JSON structure as Elixir values:
@@ -189,9 +192,11 @@ iex> RDF.json(~s({"foo": 1})) |> RDF.JSON.value(keys: :atoms)
 You can create a prettified version of a JSON literal with `RDF.JSON.prettified/1` or a canonicalized version with `RDF.JSON.canonical/1` (which follows the JSON Canonicalization Scheme).
 
 ```elixir
-RDF.json(%{foo: 42}) |> RDF.JSON.prettified()
+iex> RDF.json(%{foo: 42}) |> RDF.JSON.prettified()
+RDF.JSON.new("{\n  \"foo\": 42\n}")
 
-RDF.json(~s({"foo": 42})) |> RDF.JSON.canonical() 
+iex> RDF.json(~s({"foo": 42.0})) |> RDF.JSON.canonical() 
+RDF.JSON.new(%{"foo" => 42})
 ```
 
 
