@@ -156,9 +156,44 @@ Besides the `RDF.LangString` datatype the following XSD datatypes are provided a
 | `xsd:QName` | ❌ |
 | `xsd:NOTATION` | ❌ |
 
+For literals with an unknown datatype, i.e. a datatype without a `RDF.Literal.Datatype` module the generic `RDF.Literal.Generic` implementation s used. For those generic literals the  `RDF.Literal.value/1` function simply returns the initially given value unvalidated and unconverted. 
+
+
+## JSON literals
+
 RDF.ex also supports the `rdf:JSON` datatype with `RDF.JSON` which allows JSON content as literal values. Please refer to the [API documentation of `RDF.JSON`](https://hexdocs.pm/rdf/RDF.JSON.html) for details.
 
-For literals with an unknown datatype, i.e. a datatype without a `RDF.Literal.Datatype` module the generic `RDF.Literal.Generic` implementation s used. For those generic literals the  `RDF.Literal.value/1` function simply returns the initially given value unvalidated and unconverted. 
+JSON literals can be created with the `RDF.JSON.new/2` constructor function or it's alias `RDF.json/1`. You can pass either a JSON string or an Elixir value (map, list, number, boolean, or nil) that will be encoded as JSON:
+
+```elixir
+# From an Elixir value
+RDF.json(%{foo: 42})
+
+# From a JSON string
+RDF.json(~s({"foo": 42}))
+
+# Creating a JSON string literal (rather than parsing it as JSON)
+RDF.json"null", as_value: true)
+```
+
+The value of a JSON literal can be accessed with the `RDF.JSON.value/2` function which returns the decoded JSON structure as Elixir values:
+
+```elixir
+iex> RDF.json(~s({"foo": 1})) |> RDF.JSON.value()
+%{"foo" => 1}
+
+iex> RDF.json(~s({"foo": 1})) |> RDF.JSON.value(keys: :atoms)
+%{foo: 1}
+```
+
+You can create a prettified version of a JSON literal with `RDF.JSON.prettified/1` or a canonicalized version with `RDF.JSON.canonical/1` (which follows the JSON Canonicalization Scheme).
+
+```elixir
+RDF.json(%{foo: 42}) |> RDF.JSON.prettified()
+
+RDF.json(~s({"foo": 42})) |> RDF.JSON.canonical() 
+```
+
 
 ## Validation
 
