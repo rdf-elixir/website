@@ -1083,5 +1083,48 @@ defmodule User do
 end
 ```
 
+The `on_validate/2` callback is called during validation with the `Grax.validate/2` function, after the standard validation checks have passed successfully. This allows you to implement custom validation logic specific to your domain model.
+
+The function receives two arguments:
+
+1. The `Grax.Schema` struct to be validated.
+2. The keyword options passed to `Grax.validate/2`.
+
+The result must be either `:ok` if the validation passes, or an `{:error, error}` tuple if the validation fails. The error will be added to the `ValidationError` under the `:on_validate` key.
+
+```elixir
+defmodule User do
+  use Grax.Schema
+
+  alias NS.{SchemaOrg, FOAF}
+
+  schema SchemaOrg.Person do
+    property name: SchemaOrg.name, type: :string, required: true
+    property emails: SchemaOrg.email, type: list_of(:string), required: true
+    property age: FOAF.age, type: :integer
+    property credit_score: EX.creditScore, type: :integer
+
+    field :password
+
+    link friends: FOAF.friend, type: list_of(User)
+  end
+
+  def on_validate(user, _opts) do
+    cond do
+      user.age && user.age < 0 ->
+        {:error, "age must be positive"}
+
+      user.credit_score && user.credit_score not in 0..850 ->
+        {:error, "credit score must be between 0 and 850"}
+
+      true ->
+        :ok
+    end
+  end
+end
+```
+
+Note that `on_validate/2` is only called when the standard validation passes. If there are type errors or cardinality violations, the custom validation will not be executed, and you'll receive the standard validation errors instead.
+
 
 
