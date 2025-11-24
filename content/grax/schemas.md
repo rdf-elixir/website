@@ -642,6 +642,34 @@ end
 ```
 
 
+### Preventing preloading
+
+Sometimes you want to prevent preloading of certain link properties. There are two options for this:
+
+- `depth: 0` prevents automatic preloading during `load`, but can be overridden by runtime `:depth` options on `load/3` or `preload/3`
+- `depth: false` completely prevents preloading and cannot be overridden by runtime `:depth` options; only explicit preloading via the `:properties` option (described in the [API chapter](api.html#explicit-preloading)) can load these links
+
+In both cases, links that are not preloaded will contain the RDF node identifiers (`RDF.IRI` or `RDF.BlankNode`) instead of loaded schema structs.
+
+```elixir
+defmodule User do
+  use Grax.Schema
+
+  alias NS.{SchemaOrg, FOAF}
+
+  schema do
+    property name: SchemaOrg.name, type: :string, required: true
+
+    # Can be preloaded later with depth option
+    link address: SchemaOrg.address, type: Address, depth: 0
+
+    # Can only be preloaded explicitly with :properties option
+    link friends: FOAF.friend, type: list_of(User), depth: false
+  end
+end
+```
+
+
 ### Inverse property links
 
 Sometimes we want to define a `link` on a `Grax.Schema` for which no RDF property exists directly. For example, in our data there is no property linking a user to a post directly. Instead there is the `schema:author`property which links a post to its authors, so exactly the inverse property of what we want. You can specify a link property on a `Grax.Schema` in those cases by declaring it as an inverse property with a minus sign before the IRI of the inverse property.

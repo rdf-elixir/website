@@ -266,7 +266,21 @@ iex(4)> Grax.preload(user, graph, depth: 2)
  }}
 ```
 
-Note, that this function essentially overwrites everything accept the data properties on the root node. 
+Note, that this function essentially overwrites everything accept the data properties on the root node.
+
+You can also preload specific link properties selectively with the `:properties` option:
+
+```elixir
+Grax.preload(user, graph, properties: [:posts])
+```
+
+A shorthand form is available for preloading a single property:
+
+```elixir
+Grax.preload(user, graph, :posts)
+```
+
+This is particularly important for links with `depth: false`, which cannot be preloaded other than explicitly with `:properties`. 
 
 
 ## Creation from scratch
