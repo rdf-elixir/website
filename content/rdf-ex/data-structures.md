@@ -6,7 +6,9 @@ RDF.ex provides various data structures for collections of statements:
 - `RDF.Graph`: a named collection of statements
 - `RDF.Dataset`:  a named collection of graphs, i.e. a collection of statements from different graphs; it may have multiple named graphs and at most one unnamed ("default") graph
 
-All of these structures have similar sets of functions and implement Elixirs `Enumerable` and `Collectable` protocol, Elixirs `Access` behaviour and the `RDF.Data` protocol of RDF.ex.
+All of these structures have similar sets of functions and implement Elixir's `Enumerable` and `Collectable` protocols, Elixir's `Access` behaviour, and the `RDF.Data.Source` protocol.
+
+For a unified, polymorphic API that works across all these structures, see the [RDF.Data chapter](/rdf-ex/rdf-data).
 
 
 ## Construction
@@ -360,7 +362,7 @@ iex> RDF.Dataset.add(dataset, [
 >]
 ```
 
-Unlike the `add` function, which always returns the same data structure as the data structure to which the addition happens, which possible means ignoring some input statements (eg. when the subject of a statement doesn't match the description subject) or reinterpreting some parts of the input statement (eg. ignoring the subject of another description), the `merge` function of the `RDF.Data` protocol implemented by all three data structures will always add all of the input statements and possibly creates another type of data structure. For example, merging two `RDF.Description`s with different subjects results in a `RDF.Graph` or adding a quad to a `RDF.Graph` with a different name than the quad’s graph context results in a `RDF.Dataset`.
+Unlike the `add` function, which always returns the same data structure as the data structure to which the addition happens, which possibly means ignoring some input statements (eg. when the subject of a statement doesn't match the description subject) or reinterpreting some parts of the input statement (eg. ignoring the subject of another description), the `RDF.Data.merge/2` function will always add all of the input statements and possibly creates another type of data structure. For example, merging two `RDF.Description`s with different subjects results in a `RDF.Graph` or adding a quad to a `RDF.Graph` with a different name than the quad's graph context results in a `RDF.Dataset`. See the [RDF.Data chapter](/rdf-ex/rdf-data) for more details on structural promotion.
 
 ```elixir
 RDF.Description.new(EX.S1, init: {EX.p, EX.O}) 
@@ -415,15 +417,7 @@ RDF.Description.new(EX.S1, {EX.p, [EX.O1, EX.O2]})
 |> Enum.each(&IO.inspect/1)
 ```
 
-The `RDF.Data` protocol offers various functions to access the contents of RDF data structures:
-
-- `RDF.Data.subjects/1` returns the set of all subject resources
-- `RDF.Data.predicates/1` returns the set of all used properties
-- `RDF.Data.objects/1` returns the set of all resources on the object position of statements - literals not included
-- `RDF.Data.resources/1` returns the set of all used resources at any position in the contained RDF statements
-- `RDF.Data.description/2` returns all statements from a data structure about the given resource as a `RDF.Description`. It will be empty if no such statements exist. On a `RDF.Dataset` it will aggregate the statements about the resource from all graphs.
-- `RDF.Data.descriptions/1` returns all `RDF.Description`s within a data structure (possible aggregated in the case of a `RDF.Dataset`)
-- `RDF.Data.statements/1` returns a list of all contained RDF statements
+The `RDF.Data` module offers various functions to access the contents of RDF data structures polymorphically, such as `subjects/1`, `predicates/1`, `object_terms/1`, `resources/1`, `description/2`, `descriptions/1`, and `statements/1`. See the [RDF.Data chapter](/rdf-ex/rdf-data) for details.
 
 The `get/3` functions return individual elements of a RDF data structure:
 
@@ -595,7 +589,7 @@ iex> RDF.Description.new(EX.S1, init: {EX.p, [EX.O1, EX.O2]})
 >
 ```
 
-Another way to delete statements is the `delete/3` function of the `RDF.Data` protocol. The only difference to `delete` functions on the data structures directly is how it handles the deletion of a `RDF.Description` from another `RDF.Description` or `RDF.Graph` from another `RDF.Graph`. While the dedicated RDF data structure function ignores the description subject or graph name and removes the statements even when they don't match, `RDF.Data.delete/3` only deletes when the description’s subject respective graph name matches.
+Another way to delete statements is the `RDF.Data.delete/2` function. The only difference to `delete` functions on the data structures directly is how it handles the deletion of a `RDF.Description` from another `RDF.Description` or `RDF.Graph` from another `RDF.Graph`. While the dedicated RDF data structure function ignores the description subject or graph name and removes the statements even when they don't match, `RDF.Data.delete/2` only deletes when the description's subject or graph name matches.
 
 ```elixir
 iex> RDF.Description.new(EX.S1, init: {EX.p, [EX.O1, EX.O2]})

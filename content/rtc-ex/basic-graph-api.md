@@ -236,7 +236,7 @@ iex> EX.S
 ]
 ```
 
-Also the `RDF.Data` protocol is implemented for `RTC.Compound`. In the `RDF.Data.merge/2` function the graph name plays a crucial role, as the merge of different graphs with different names results in a `RDF.Dataset`. But since compounds are just a bunch of triples inside a graph, the protocol implementation of `RDF.Data.merge/2` behaves different than the one for `RDF.Graph`s. The compound id or configured graph name of a compound is ignored and the compound is treated just like a set of triples. So, applying `RDF.Data.merge/2` on a `RTC.Compound` with any other RDF.ex data structure or another compound always returns a `RDF.Graph`.
+Also the `RDF.Data.Source` protocol is implemented for `RTC.Compound`. In the `RDF.Data.merge/2` function the graph name plays a crucial role, as the merge of different graphs with different names results in a `RDF.Dataset`. But since compounds are just a bunch of triples inside a graph, the protocol implementation of `RDF.Data.merge/2` behaves different than the one for `RDF.Graph`s. The compound id or configured graph name of a compound is ignored and the compound is treated just like a set of triples. So, applying `RDF.Data.merge/2` on a `RTC.Compound` with any other RDF.ex data structure or another compound always returns a `RDF.Graph`.
 
 ```elixir
 iex> RDF.Graph.new({EX.S, EX.p(), EX.O1})

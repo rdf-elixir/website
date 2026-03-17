@@ -92,6 +92,7 @@ function getRDFSidebar () {
         'literals',
         'statements',
         'data-structures',
+        'rdf-data',
         'lists',
         'description-and-graph-dsl',
         'mapping-between-rdf-and-elixir',
