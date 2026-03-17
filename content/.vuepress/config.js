@@ -43,6 +43,7 @@ function getNav () {
     navItem('RDF.ex', '/rdf-ex/'),
     navItem('SPARQL.ex', '/sparql-ex/'),
     navItem('ShEx.ex', '/shex-ex/'),
+    navItem('Gno', '/gno/'),
     navItem('Grax', '/grax/'),
     navItem('RTC.ex', '/rtc-ex/'),
     {
@@ -53,7 +54,8 @@ function getNav () {
         navItem('ShEx.ex', 'https://hexdocs.pm/shex/'),
         navItem('JSON-LD.ex', 'https://hexdocs.pm/json_ld/'),
         navItem('RDF-XML.ex', 'https://hexdocs.pm/rdf_xml/'),
-        navItem('RTC.ex', 'https://hexdocs.pm/rtc/')
+        navItem('RTC.ex', 'https://hexdocs.pm/rtc/'),
+        navItem('Gno', 'https://hexdocs.pm/gno/')
       ]
     },
     navItem('Links', '/links')
@@ -73,6 +75,7 @@ function getSidebar () {
     '/rdf-ex/': getRDFSidebar(),
     '/sparql-ex/': getSPARQLSidebar(),
     '/shex-ex/': getShExSidebar(),
+    '/gno/': getGnoSidebar(),
     '/grax/': getGraxSidebar(),
     '/rtc-ex/': getRTCSidebar()
   }
@@ -134,6 +137,22 @@ function getShExSidebar () {
         'shape-maps',
         'validation',
         'limitations',
+      ]
+    }
+  ]
+}
+
+function getGnoSidebar () {
+  return [
+    {
+      title: 'Gno',
+      collapsable: false,
+      children: [
+        '',
+        'installation',
+        'configuration',
+        'querying-data',
+        'managing-data'
       ]
     }
   ]
