@@ -111,11 +111,15 @@ iex> Grax.load(graph, EX.User1, User)
  }}
 ```
 
-The `Grax.Schema` modules also provide a dedicated `load/3` function on which the schema is implicit. So, the following function call is equivalent to the previous call:
+The `Grax.Schema` modules also provide a dedicated `load/2` function on which the schema is implicit. So, the following function call is equivalent to the previous call:
 
 ```elixir
 graph |> User.load(EX.User1)
 ```
+
+::: warning
+However, it is not equivalent in general: Although the default implementation of the generated `load/2` functions simply delegates to `Grax.load/3`, the function is overridable, which means that it can provide additional logic for some schemes.
+:::
 
 It is also possible to omit the schema on the general `Grax.load/3` function. In this case Grax trys to automatically detect the schema based on the `rdf:type` of the loaded resource. That means the most specific schema with a class declaration matching one of the `rdf:type`s will be selected. So, since our `User` schema is associated with the Schema.org class used in our example data, we can also load this resource with:
 

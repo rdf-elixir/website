@@ -273,6 +273,8 @@ Above these there are a couple of special datatypes:
 
 - The `:iri` datatype can be used if IRIs should be kept as they are, which is useful when they shouldn't be mapped to nested mapping structs.
 
+- The `:rdf_term` datatype behaves like `:any` in that it accepts any RDF term (IRIs, blank nodes, and literals), but unlike `:any` it does **not** convert `RDF.Literal` values to native Elixir values during loading. The RDF terms are preserved as-is in the struct. This is useful when downstream code needs to work uniformly with RDF terms, e.g. for inserting them into `RDF.Description`s without needing to convert back. Only actual RDF term structs (`RDF.IRI`, `RDF.BlankNode`, `RDF.Literal`) are accepted as values.
+
 
 ### Default values
 
