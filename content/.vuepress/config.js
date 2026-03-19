@@ -57,6 +57,7 @@ function getNav () {
         navItem('JSON-LD.ex', 'https://hexdocs.pm/json_ld/'),
         navItem('RDF-XML.ex', 'https://hexdocs.pm/rdf_xml/'),
         navItem('RTC.ex', 'https://hexdocs.pm/rtc/'),
+        navItem('DCAT-R.ex', 'https://hexdocs.pm/dcatr/'),
         navItem('Gno', 'https://hexdocs.pm/gno/')
       ]
     },

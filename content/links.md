@@ -17,6 +17,7 @@ These libraries provide the foundation for working with RDF and related technolo
 | SPARQL.Client | [GitHub](https://github.com/rdf-elixir/sparql_client) • [Hex](https://hex.pm/packages/sparql_client) • [HexDocs](https://hexdocs.pm/sparql_client) |
 | ShEx.ex | [GitHub](https://github.com/rdf-elixir/shex-ex) • [Hex](https://hex.pm/packages/shex) • [HexDocs](https://hexdocs.pm/shex) |
 | Grax | [GitHub](https://github.com/rdf-elixir/grax) • [Hex](https://hex.pm/packages/grax) • [HexDocs](https://hexdocs.pm/grax) |
+| Gno | [GitHub](https://github.com/rdf-elixir/gno) • [Hex](https://hex.pm/packages/gno) • [HexDocs](https://hexdocs.pm/gno) |
 
 
 ## RDF Vocabularies on Elixir
@@ -35,11 +36,12 @@ Packages for common RDF vocabularies providing `RDF.Vocabulary.Namespace`s and G
 
 Additional tools and libraries building upon or complementing the RDF on Elixir ecosystem.
 
-| Project | Description | Links |
-|---------|-------------|-------|
-| RTC.ex | RDF triple compounds in Elixir | [GitHub](https://github.com/rtc-org/rtc-ex) • [Hex](https://hex.pm/packages/rtc) • [HexDocs](https://hexdocs.pm/rtc) • [Spec](https://rtc-org.github.io/spec/) |
-| Ontogen | A version control system for RDF datasets | [GitHub](https://github.com/ontogen/ontogen) • [Hex](https://hex.pm/packages/ontogen) • [HexDocs](https://hexdocs.pm/ontogen) • [Homepage](https://ontogen.io/) |
-| Skout | A YAML-based tree-format for SKOS concept schemes | [GitHub](https://github.com/marcelotto/skout) • [Hex](https://hex.pm/packages/skout) • [HexDocs](https://hexdocs.pm/skout) |
+| Project   | Description                                       | Links                                                                                                                                                           |
+|-----------|---------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| RTC.ex    | RDF triple compounds in Elixir                    | [GitHub](https://github.com/rtc-org/rtc-ex) • [Hex](https://hex.pm/packages/rtc) • [HexDocs](https://hexdocs.pm/rtc) • [Spec](https://rtc-org.github.io/spec/)  |
+| DCAT-R.ex | A framework for DCAT-R-based services              | [GitHub](https://github.com/dcat-r/dcatr-ex) • [Hex](https://hex.pm/packages/dcatr) • [HexDocs](https://hexdocs.pm/dcatr) • [Spec](https://w3id.org/dcatr)     |
+| Ontogen   | A version control system for RDF datasets         | [GitHub](https://github.com/ontogen/ontogen) • [Hex](https://hex.pm/packages/ontogen) • [HexDocs](https://hexdocs.pm/ontogen) • [Homepage](https://ontogen.io/) |
+| Skout     | A YAML-based tree-format for SKOS concept schemes | [GitHub](https://github.com/marcelotto/skout) • [Hex](https://hex.pm/packages/skout) • [HexDocs](https://hexdocs.pm/skout)                                      |
 
 
 # Community
