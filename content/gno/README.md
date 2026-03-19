@@ -1,6 +1,6 @@
 # Introduction
 
-Gno is a library for managing RDF datasets in SPARQL triple stores. It provides a unified API that abstracts the differences between storage backends, so you can work with your data the same way regardless of whether it is stored in Apache Jena Fuseki, Oxigraph, or another SPARQL-compatible store.
+Gno is a library for managing RDF datasets in SPARQL triple stores. It provides a unified API that abstracts the differences between storage backends, so you can work with your data the same way regardless of the underlying SPARQL triple store.
 
 Gno uses [DCAT-R](https://w3id.org/dcatr) (Data Catalog Vocabulary for RDF Repositories) for its structural model. DCAT-R extends the W3C's [DCAT](https://www.w3.org/TR/vocab-dcat-3/) vocabulary to describe how RDF repositories are organized internally. In practice, this means your repository structure and configuration are described in RDF itself.
 
@@ -30,6 +30,8 @@ Gno supports multiple SPARQL backends through a store adapter system. Built-in a
 
 - **Apache Jena Fuseki**
 - **Oxigraph**
+- **QLever**
+- **Ontotext GraphDB**
 
 You can also configure a generic store with explicit endpoint URLs for any SPARQL 1.1-compatible backend.
 

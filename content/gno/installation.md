@@ -51,6 +51,27 @@ oxigraph serve --location /tmp/oxigraph-data
 
 It listens on port 7878 by default and requires no additional setup.
 
+### QLever
+
+[QLever](https://github.com/ad-freiburg/qlever) requires building an index before starting the server. Install the `qlever` CLI tool, then:
+
+```bash
+# Create a Qleverfile (or configure manually)
+qlever setup-config default
+
+# Add your data files and build the index
+qlever index
+
+# Start the server with update support
+qlever start --persist-updates
+```
+
+QLever listens on the port configured in the Qleverfile and requires an access token for write operations.
+
+### GraphDB
+
+Install [Ontotext GraphDB](https://graphdb.ontotext.com/) following the [official installation guide](https://graphdb.ontotext.com/documentation/11.0/installation.html). It listens on port 7200 by default.
+
 ## Next Steps
 
 With the dependencies installed and a store backend running, you need to configure your service, repository, and store connection through Gno's manifest system. Continue with the [Configuration](configuration) guide.

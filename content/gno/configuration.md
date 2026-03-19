@@ -157,6 +157,7 @@ When using the Gno API, you can refer to graphs by symbolic selectors instead of
 - `:default` - the default graph
 - `:primary` - the primary data graph
 - `:repo_manifest` - the repository manifest graph
+- `:union` - the union of all graphs (see next section)
 
 ```elixir
 {:ok, graph} = Gno.graph(:primary)
@@ -164,6 +165,45 @@ When using the Gno API, you can refer to graphs by symbolic selectors instead of
 ```
 
 These selectors are resolved through the service configuration to the actual graph names in the store.
+
+### Default Graph Semantics
+
+SPARQL stores differ in what they return when querying the default graph (i.e. without a `GRAPH` clause):
+
+- **Isolated**: The default graph contains only its own triples. Named graphs are separate. (Fuseki, Oxigraph)
+- **Union**: The default graph returns the union of all triples across all graphs. (QLever, GraphDB)
+
+Gno normalizes this behavior transparently: on stores with union semantics, queries targeting the default graph (`:default` or no `:graph` option) automatically restrict to the real default graph using the SPARQL protocol's `default-graph-uri` parameter.
+
+To explicitly query the union of all graphs on a union store, use the `:union` graph selector:
+
+```elixir
+{:ok, result} = Gno.select("SELECT * WHERE { ?s ?p ?o }", graph: :union)
+```
+
+For stores with configurable semantics (e.g. Fuseki can be configured for union mode), you can override the adapter's default via the `gno:storeDefaultGraphSemantics` manifest property:
+
+```turtle
+<Fuseki> a gnoa:Fuseki
+    ; gno:storeEndpointDataset "my-dataset"
+    ; gno:storeDefaultGraphSemantics "union"
+.
+```
+
+::: warning
+
+The automatic normalization only applies to read operations (SELECT, ASK, CONSTRUCT, DESCRIBE). For SPARQL UPDATE queries with WHERE clauses, the graph must be specified in the query itself. Use `Gno.default_graph_iri/0` to get the store-specific default graph IRI for interpolation:
+
+```elixir
+Gno.update("""
+  WITH <#{Gno.default_graph_iri()}>
+  DELETE { ?s <#{EX.p()}> ?old }
+  INSERT { ?s <#{EX.p()}> "new" }
+  WHERE  { ?s <#{EX.p()}> ?old }
+""")
+```
+
+:::
 
 ## Store Adapters
 
@@ -197,6 +237,46 @@ The adapter constructs SPARQL endpoint URLs from the scheme, host, port, and dat
 ```
 
 All properties have sensible defaults, so a minimal `<Oxigraph> a gnoa:Oxigraph .` is sufficient for a local development setup.
+
+### QLever
+
+```turtle
+@prefix gno: <https://w3id.org/gno#> .
+@prefix gnoa: <https://w3id.org/gno/store/adapter/> .
+
+<Qlever> a gnoa:Qlever
+    ; gno:storeEndpointScheme "http"              # optional (default: "http")
+    ; gno:storeEndpointHost "localhost"           # optional (default: "localhost")
+    ; gno:storeEndpointPort 7001                  # optional (default: 7001)
+    ; gnoa:qleverAccessToken "my-access-token"    # required for write operations
+.
+```
+
+QLever uses a single endpoint for all operations. Write operations require an access token configured via `gnoa:qleverAccessToken`.
+
+::: warning
+
+QLever does not support SPARQL graph management operations LOAD, CLEAR, CREATE, ADD, COPY, and MOVE.
+
+:::
+
+### GraphDB
+
+```turtle
+@prefix gno: <https://w3id.org/gno#> .
+@prefix gnoa: <https://w3id.org/gno/store/adapter/> .
+
+<GraphDB> a gnoa:GraphDB
+    ; gno:storeEndpointScheme "http"              # optional (default: "http")
+    ; gno:storeEndpointHost "localhost"           # optional (default: "localhost")
+    ; gno:storeEndpointPort 7200                  # optional (default: 7200)
+    ; gno:storeEndpointDataset "my-repository"   # required
+.
+```
+
+A GraphDB repository must be created before use, e.g. through the [GraphDB Workbench](https://graphdb.ontotext.com/documentation/11.0/workbench/creating-a-repository.html) or the [REST API](https://graphdb.ontotext.com/documentation/11.0/manage-repos-with-restapi.html). The `gno:storeEndpointDataset` value must match the repository ID.
+
+GraphDB uses union default graph semantics by default. If a repository is configured for isolated semantics, this can be declared via `gno:storeDefaultGraphSemantics "isolated"`.
 
 ### Generic Store
 
