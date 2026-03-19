@@ -43,7 +43,9 @@ function getNav () {
     navItem('RDF.ex', '/rdf-ex/'),
     navItem('SPARQL.ex', '/sparql-ex/'),
     navItem('ShEx.ex', '/shex-ex/'),
-    navItem('Gno', '/gno/'),
+    // Path is /gno-guide/ because /gno/ is used for the vocabulary term
+    // documentation (pyLODE) served via GitHub Pages from the gno repo.
+    navItem('Gno', '/gno-guide/'),
     navItem('Grax', '/grax/'),
     navItem('RTC.ex', '/rtc-ex/'),
     {
@@ -75,7 +77,7 @@ function getSidebar () {
     '/rdf-ex/': getRDFSidebar(),
     '/sparql-ex/': getSPARQLSidebar(),
     '/shex-ex/': getShExSidebar(),
-    '/gno/': getGnoSidebar(),
+    '/gno-guide/': getGnoSidebar(),
     '/grax/': getGraxSidebar(),
     '/rtc-ex/': getRTCSidebar()
   }

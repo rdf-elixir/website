@@ -5,7 +5,7 @@ Gno provides functions for all SPARQL query forms. These functions execute queri
 All query functions accept the general options described in the [Introduction](./):
 
 - `:service` - use a specific service instead of the default from the manifest
-- `:graph` - the target graph: a [graph selector](/gno/configuration#graph-selectors) (e.g. `:default`, `:primary`), a graph ID, or a configured [local graph name](/gno/configuration#graph-ids-and-graph-names)
+- `:graph` - the target graph: a [graph selector](/gno-guide/configuration#graph-selectors) (e.g. `:default`, `:primary`), a graph ID, or a configured [local graph name](/gno-guide/configuration#graph-ids-and-graph-names)
 
 ## SELECT queries
 
@@ -62,7 +62,7 @@ result.results
 {:ok, graph} = Gno.graph("http://example.org/my-graph")
 ```
 
-See [Graph Selectors](/gno/configuration#graph-selectors) for details on the available symbolic names and how they are resolved.
+See [Graph Selectors](/gno-guide/configuration#graph-selectors) for details on the available symbolic names and how they are resolved.
 
 ## Bang variants
 
